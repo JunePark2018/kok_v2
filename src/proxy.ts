@@ -7,7 +7,7 @@ export async function proxy(request: NextRequest) {
   let { supabaseResponse } = await updateSession(request);
 
   // Vercel Edge automatically injects the 'x-vercel-ip-country' header
-  const vercelCountry = request.geo?.country || request.headers.get('x-vercel-ip-country');
+  const vercelCountry = request.headers.get('x-vercel-ip-country');
   const country = vercelCountry || 'US'; // Default to global US
 
   // Next.js middleware returns the modified response headers
