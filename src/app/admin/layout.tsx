@@ -42,10 +42,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </nav>
 
         <div className="p-4 border-t border-gray-800">
-          <Link href="/" className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors">
+          <button 
+            onClick={() => {
+              document.cookie = "kokkok_admin_auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+              window.location.href = '/';
+            }}
+            className="w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors border-none bg-transparent"
+          >
             <LogOut className="w-5 h-5" />
             Exit Admin
-          </Link>
+          </button>
         </div>
       </aside>
 
