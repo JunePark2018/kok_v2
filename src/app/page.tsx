@@ -42,12 +42,12 @@ export default function Home() {
     }
   ];
 
-  // Placeholder Shorts - in the real app, this comes from admin API
+  // Placeholder Shorts - Influencer Cosmetic & Skincare Reviews
   const dummyShorts = [
-    "https://www.youtube.com/embed/LXb3EKWsInQ",
-    "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    "https://www.youtube.com/embed/fJ9rUzIMcZQ", 
-    "https://www.youtube.com/embed/tgbNymZ7vqY"
+    "https://www.youtube.com/embed/mU52U_yBqJg", // typical skincare 1
+    "https://www.youtube.com/embed/Z0o4S8mX6oU", // typical skincare 2
+    "https://www.youtube.com/embed/1vG4Jz_K9r8", // typical skincare 3
+    "https://www.youtube.com/embed/J7dCReT2aK4"  // typical skincare 4
   ];
 
   return (
