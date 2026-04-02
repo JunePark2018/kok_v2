@@ -6,7 +6,7 @@ import { createClient } from '@supabase/supabase-js';
 // Initialize Supabase Client defensively
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
 interface Short {
   id: string;
@@ -23,6 +23,7 @@ export default function ShortsAdminPage() {
   useEffect(() => {
     async function fetchShorts() {
       try {
+        if (!supabase) throw new Error("No client");
         const { data, error } = await supabase.from('shorts').select('*').order('created_at', { ascending: false });
         if (error || !data) throw error;
         
@@ -60,6 +61,7 @@ export default function ShortsAdminPage() {
 
       // Attempt DB Insert
       try {
+        if (!supabase) throw new Error("No client");
         const { error } = await supabase.from('shorts').insert([{ youtube_id: videoId }]);
         if (error) {
           console.warn("DB Insert failed. Operating in Mock Mode.");
@@ -80,6 +82,7 @@ export default function ShortsAdminPage() {
     setShorts(shorts.filter(s => s.id !== id));
 
     try {
+      if (!supabase) throw new Error("No client");
       const { error } = await supabase.from('shorts').delete().eq('id', id);
       if (error) {
          console.warn("DB Delete failed. Operating in Mock Mode.");

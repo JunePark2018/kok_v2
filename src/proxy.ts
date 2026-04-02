@@ -13,6 +13,14 @@ export async function proxy(request: NextRequest) {
   // Next.js middleware returns the modified response headers
   supabaseResponse.headers.set('x-user-country', country);
 
+  // Custom Admin Gating Logic
+  if (request.nextUrl.pathname.startsWith('/admin')) {
+    const hasAuthCookie = request.cookies.has('kokkok_admin_auth');
+    if (!hasAuthCookie) {
+      return NextResponse.redirect(new URL('/login', request.url));
+    }
+  }
+
   return supabaseResponse;
 }
 
