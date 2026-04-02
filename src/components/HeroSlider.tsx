@@ -4,29 +4,128 @@ import React, { useEffect, useState, useCallback } from 'react';
 import useEmblaCarousel from 'embla-carousel-react';
 import Autoplay from 'embla-carousel-autoplay';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import type { Lang } from '@/lib/i18n/types';
 
-const slides = [
-  {
-    id: 1,
-    badge: '수분천재 크림',
-    title: '강력한 고보습 케어\nPDRN 속광 수분 크림',
-    subtitle: '사계절 + 속수분 + 수분광 + 모공쫀쫀',
-    image: 'https://plus.unsplash.com/premium_photo-1681996500858-ff9cc3f28203?q=80&w=1587&auto=format&fit=crop', // Realistic unspash cosmetic image
-    bgClass: 'bg-[#eef4f7]',
-  },
-  {
-    id: 2,
-    badge: '뷰티 유튜버 PICK',
-    title: '빛나는 결 보습\n비타민 글로우 세럼',
-    subtitle: '미백 + 매끈결 + 투명광채 + 생기충전',
-    image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1587&auto=format&fit=crop',
-    bgClass: 'bg-[#f4ebe6]',
-  }
-];
+const slideData: Record<Lang, Array<{ id: number; badge: string; title: string; subtitle: string; image: string; bgClass: string }>> = {
+  kr: [
+    {
+      id: 1,
+      badge: '수분천재 크림',
+      title: '강력한 고보습 케어\nPDRN 속광 수분 크림',
+      subtitle: '사계절 + 속수분 + 수분광 + 모공쫀쫀',
+      image: 'https://plus.unsplash.com/premium_photo-1681996500858-ff9cc3f28203?q=80&w=1587&auto=format&fit=crop',
+      bgClass: 'bg-[#eef4f7]',
+    },
+    {
+      id: 2,
+      badge: '뷰티 유튜버 PICK',
+      title: '빛나는 결 보습\n비타민 글로우 세럼',
+      subtitle: '미백 + 매끈결 + 투명광채 + 생기충전',
+      image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1587&auto=format&fit=crop',
+      bgClass: 'bg-[#f4ebe6]',
+    },
+  ],
+  en: [
+    {
+      id: 1,
+      badge: 'Hydration Genius Cream',
+      title: 'Intense Moisture Care\nPDRN Glow Hydration Cream',
+      subtitle: 'All-Season • Deep Moisture • Glow Skin • Pore Care',
+      image: 'https://plus.unsplash.com/premium_photo-1681996500858-ff9cc3f28203?q=80&w=1587&auto=format&fit=crop',
+      bgClass: 'bg-[#eef4f7]',
+    },
+    {
+      id: 2,
+      badge: 'Beauty Youtuber PICK',
+      title: 'Luminous Skin Moisture\nVitamin Glow Serum',
+      subtitle: 'Brightening • Smooth Texture • Radiance • Vitality Boost',
+      image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1587&auto=format&fit=crop',
+      bgClass: 'bg-[#f4ebe6]',
+    },
+  ],
+  cn: [
+    {
+      id: 1,
+      badge: '保湿天才面霜',
+      title: '强效深层保湿\nPDRN光感水润面霜',
+      subtitle: '四季适用 • 深层补水 • 水光肌 • 毛孔紧致',
+      image: 'https://plus.unsplash.com/premium_photo-1681996500858-ff9cc3f28203?q=80&w=1587&auto=format&fit=crop',
+      bgClass: 'bg-[#eef4f7]',
+    },
+    {
+      id: 2,
+      badge: '美妆博主推荐',
+      title: '光泽肌肤保湿\n维他命焕光精华',
+      subtitle: '美白 • 光滑肤质 • 透明光泽 • 活力充沛',
+      image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1587&auto=format&fit=crop',
+      bgClass: 'bg-[#f4ebe6]',
+    },
+  ],
+  jp: [
+    {
+      id: 1,
+      badge: '保湿天才クリーム',
+      title: '強力な高保湿ケア\nPDRNうるおいクリーム',
+      subtitle: '四季対応 • 深層保湿 • 水光肌 • 毛穴ケア',
+      image: 'https://plus.unsplash.com/premium_photo-1681996500858-ff9cc3f28203?q=80&w=1587&auto=format&fit=crop',
+      bgClass: 'bg-[#eef4f7]',
+    },
+    {
+      id: 2,
+      badge: '美容YouTuber PICK',
+      title: '輝く肌保湿\nビタミングロウセラム',
+      subtitle: '美白 • なめらか肌 • 透明感 • 生き生き肌',
+      image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1587&auto=format&fit=crop',
+      bgClass: 'bg-[#f4ebe6]',
+    },
+  ],
+  vn: [
+    {
+      id: 1,
+      badge: 'Kem Dưỡng Ẩm Thiên Tài',
+      title: 'Chăm Sóc Dưỡng Ẩm Chuyên Sâu\nKem Dưỡng Ẩm PDRN',
+      subtitle: 'Bốn Mùa • Dưỡng Ẩm Sâu • Da Sáng • Lỗ Chân Lông',
+      image: 'https://plus.unsplash.com/premium_photo-1681996500858-ff9cc3f28203?q=80&w=1587&auto=format&fit=crop',
+      bgClass: 'bg-[#eef4f7]',
+    },
+    {
+      id: 2,
+      badge: 'Beauty Youtuber PICK',
+      title: 'Dưỡng Ẩm Da Rạng Rỡ\nSerum Glow Vitamin',
+      subtitle: 'Làm Sáng • Mịn Da • Rạng Rỡ • Tràn Đầy Sức Sống',
+      image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1587&auto=format&fit=crop',
+      bgClass: 'bg-[#f4ebe6]',
+    },
+  ],
+  th: [
+    {
+      id: 1,
+      badge: 'ครีมเนรมิตความชุ่มชื้น',
+      title: 'บำรุงผิวให้ชุ่มชื้นอย่างล้ำลึก\nPDRN Hydration Cream',
+      subtitle: 'ทุกฤดูกาล • ชุ่มชื้นลึก • ผิวเรืองแสง • รูขุมขนแน่น',
+      image: 'https://plus.unsplash.com/premium_photo-1681996500858-ff9cc3f28203?q=80&w=1587&auto=format&fit=crop',
+      bgClass: 'bg-[#eef4f7]',
+    },
+    {
+      id: 2,
+      badge: 'Beauty YouTuber เลือก',
+      title: 'บำรุงผิวให้เปล่งปลั่ง\nVitamin Glow Serum',
+      subtitle: 'ผิวกระจ่าง • เนียนนุ่ม • ผิวใส • ชุ่มชื้น',
+      image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1587&auto=format&fit=crop',
+      bgClass: 'bg-[#f4ebe6]',
+    },
+  ],
+};
 
-export default function HeroSlider() {
+interface HeroSliderProps {
+  lang?: Lang;
+}
+
+export default function HeroSlider({ lang = 'kr' }: HeroSliderProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [Autoplay({ delay: 5000 })]);
   const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const slides = slideData[lang] ?? slideData['en'];
 
   const scrollPrev = useCallback(() => {
     if (emblaApi) emblaApi.scrollPrev();
@@ -71,9 +170,6 @@ export default function HeroSlider() {
                 {/* Image */}
                 <div className="absolute right-0 bottom-0 top-0 w-1/2 flex justify-end items-center sm:relative sm:w-auto h-full p-4 sm:p-12 opacity-80 sm:opacity-100">
                   <div className="relative h-[80%] aspect-[5/6] mr-8 shadow-2xl overflow-hidden rounded-md">
-                    <div className="absolute top-2 left-2 bg-black/70 text-white text-[11px] px-2 py-1 rounded z-20 font-mono backdrop-blur-sm">
-                      Target: 1000x1200 (5:6)
-                    </div>
                     <img 
                       src={slide.image} 
                       alt={slide.title.replace('\n', ' ')}

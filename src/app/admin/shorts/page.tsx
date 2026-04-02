@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import { Video, Trash2, Plus } from 'lucide-react';
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize Supabase Client defensively
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
@@ -19,18 +18,15 @@ export default function ShortsAdminPage() {
   const [newUrl, setNewUrl] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch initial data
   useEffect(() => {
     async function fetchShorts() {
       try {
-        if (!supabase) throw new Error("No client");
+        if (!supabase) throw new Error("클라이언트 없음");
         const { data, error } = await supabase.from('shorts').select('*').order('created_at', { ascending: false });
         if (error || !data) throw error;
-        
         setShorts(data.map(d => ({ id: d.id, youtubeId: d.youtube_id, addedAt: new Date(d.created_at).toISOString().split('T')[0] })));
       } catch (e) {
-        console.error("Supabase connection failed. Falling back to mock data.", e);
-        // Fallback Mock Data
+        console.error("Supabase 연결 실패. 목업 데이터로 전환.", e);
         setShorts([
           { id: '1', youtubeId: 'ho0EhuO3RNs', addedAt: '2026-04-01' },
           { id: '2', youtubeId: 'lD1VId0ec2s', addedAt: '2026-04-01' },
@@ -48,77 +44,77 @@ export default function ShortsAdminPage() {
     e.preventDefault();
     if (!newUrl) return;
     
-    // Simple extraction logic for youtube URLs
     const match = newUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/|shorts\/)([^"&?\/\s]{11})/);
     const videoId = match ? match[1] : (newUrl.length === 11 ? newUrl : null);
 
     if (videoId) {
-      // Optimistic UI Update
       const tempId = Date.now().toString();
       const newShort = { id: tempId, youtubeId: videoId, addedAt: new Date().toISOString().split('T')[0] };
       setShorts([newShort, ...shorts]);
       setNewUrl('');
 
-      // Attempt DB Insert
       try {
-        if (!supabase) throw new Error("No client");
+        if (!supabase) throw new Error("클라이언트 없음");
         const { error } = await supabase.from('shorts').insert([{ youtube_id: videoId }]);
         if (error) {
-          console.warn("DB Insert failed. Operating in Mock Mode.");
+          console.warn("DB 삽입 실패. 목업 모드로 동작 중.");
         } else {
-           alert(`[ADMIN] Success! YouTube ID '${videoId}' is now live on the Homepage.`);
+           alert(`[관리자] 성공! YouTube ID '${videoId}' 가 홈페이지에 게시되었습니다.`);
         }
       } catch (e) {
-         console.warn("Operating in Mock Mode");
+         console.warn("목업 모드로 동작 중");
       }
     } else {
-      alert('Invalid YouTube URL or ID');
+      alert('유효하지 않은 YouTube URL 또는 ID입니다.');
     }
   };
 
   const handleDelete = async (id: string) => {
-    // Optimistic Delete
-    const original = [...shorts];
     setShorts(shorts.filter(s => s.id !== id));
-
     try {
-      if (!supabase) throw new Error("No client");
+      if (!supabase) throw new Error("클라이언트 없음");
       const { error } = await supabase.from('shorts').delete().eq('id', id);
       if (error) {
-         console.warn("DB Delete failed. Operating in Mock Mode.");
+         console.warn("DB 삭제 실패. 목업 모드로 동작 중.");
       }
     } catch {
-       console.warn("DB Delete failed.");
+       console.warn("DB 삭제 실패.");
     }
   };
 
-  if (isLoading) return <div className="p-10 animate-pulse bg-gray-100 rounded-xl h-64 flex items-center justify-center">Loading Live Shorts...</div>;
+  if (isLoading) return (
+    <div className="p-10 animate-pulse bg-gray-100 rounded-xl h-64 flex items-center justify-center text-gray-400 font-bold tracking-widest">
+      숏츠 불러오는 중...
+    </div>
+  );
 
   return (
     <div className="space-y-8">
-      {/* Add New Short */}
+      {/* 새 숏츠 추가 */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2"><Video className="w-5 h-5 text-purple-500" /> Add New Brand Short</h2>
+        <h2 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+          <Video className="w-5 h-5 text-purple-500" /> 새 브랜드 숏츠 추가
+        </h2>
         <form onSubmit={handleAdd} className="flex gap-4">
           <input 
             type="text" 
             value={newUrl}
             onChange={(e) => setNewUrl(e.target.value)}
-            placeholder="Paste YouTube Shorts URL or Video ID (e.g. ho0EhuO3RNs)"
+            placeholder="YouTube Shorts URL 또는 영상 ID 붙여넣기 (예: ho0EhuO3RNs)"
             className="flex-1 px-4 py-3 border border-gray-200 rounded-lg text-sm bg-gray-50 focus:outline-none focus:ring-2 focus:ring-black/5"
           />
           <button type="submit" className="bg-[#111111] text-white px-6 py-3 rounded-lg text-sm font-semibold hover:bg-black transition-colors whitespace-nowrap flex items-center gap-2">
-            <Plus className="w-4 h-4" /> Add to Feed
+            <Plus className="w-4 h-4" /> 피드에 추가
           </button>
         </form>
-        <p className="text-xs text-gray-400 mt-3">The homepage will automatically sync to show up to 10 of these videos.</p>
+        <p className="text-xs text-gray-400 mt-3">홈페이지에 최대 10개까지 자동으로 표시됩니다.</p>
       </div>
 
-      {/* Active Shorts Grid */}
+      {/* 현재 게시 중인 숏츠 */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-          <h2 className="text-lg font-bold text-gray-800">Currently Live on Storefront</h2>
-          <span className="text-sm font-medium text-gray-500">{shorts.length} Items</span>
+          <h2 className="text-lg font-bold text-gray-800">현재 스토어에 게시 중</h2>
+          <span className="text-sm font-medium text-gray-500">{shorts.length}개 항목</span>
         </div>
         
         <div className="p-6 grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -127,7 +123,7 @@ export default function ShortsAdminPage() {
               <div className="aspect-[9/16] w-full">
                 <img 
                   src={`https://i.ytimg.com/vi/${short.youtubeId}/hqdefault.jpg`} 
-                  alt="Thumbnail" 
+                  alt="썸네일" 
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -140,7 +136,7 @@ export default function ShortsAdminPage() {
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
-              <div className="p-3 text-xs text-gray-500 font-medium">Added: {short.addedAt}</div>
+              <div className="p-3 text-xs text-gray-500 font-medium">추가일: {short.addedAt}</div>
             </div>
           ))}
         </div>

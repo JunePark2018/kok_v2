@@ -8,18 +8,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
 
   const navItems = [
-    { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-    { name: 'Users', href: '/admin/users', icon: Users },
-    { name: 'Products', href: '/admin/products', icon: Package },
-    { name: 'Shorts', href: '/admin/shorts', icon: Video },
+    { name: '대시보드', href: '/admin', icon: LayoutDashboard },
+    { name: '사용자', href: '/admin/users', icon: Users },
+    { name: '상품 관리', href: '/admin/products', icon: Package },
+    { name: '숏츠', href: '/admin/shorts', icon: Video },
   ];
+
+  const pageTitle: Record<string, string> = {
+    '/admin': '대시보드 개요',
+    '/admin/users': '사용자 관리',
+    '/admin/products': '상품 관리',
+    '/admin/shorts': '숏츠 관리',
+  };
 
   return (
     <div className="flex h-screen bg-gray-50 font-sans">
-      {/* Sidebar */}
+      {/* 사이드바 */}
       <aside className="w-64 bg-[#111111] text-white flex flex-col">
         <div className="h-16 flex items-center px-6 border-b border-gray-800">
-          <span className="text-lg font-bold tracking-widest">ADMIN PORTAL</span>
+          <span className="text-lg font-bold tracking-widest">관리자 포털</span>
         </div>
         
         <nav className="flex-1 py-6 px-4 space-y-2">
@@ -50,16 +57,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             className="w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors border-none bg-transparent"
           >
             <LogOut className="w-5 h-5" />
-            Exit Admin
+            로그아웃
           </button>
         </div>
       </aside>
 
-      {/* Main Content */}
+      {/* 메인 콘텐츠 */}
       <main className="flex-1 overflow-auto">
         <header className="h-16 bg-white border-b border-gray-200 flex items-center px-8 shadow-sm">
-          <h1 className="text-xl font-semibold text-gray-800 capitalize">
-            {pathname === '/admin' ? 'Dashboard Overview' : pathname.split('/').pop()}
+          <h1 className="text-xl font-semibold text-gray-800">
+            {pageTitle[pathname] ?? pathname.split('/').pop()}
           </h1>
         </header>
         <div className="p-8">

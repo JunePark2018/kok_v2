@@ -1,29 +1,39 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { updateSession } from '@/lib/supabase/middleware';
 
 export async function proxy(request: NextRequest) {
-  // Update session and protect /admin routes using Supabase
-  let { supabaseResponse } = await updateSession(request);
+  const { pathname } = request.nextUrl;
 
-  // Vercel Edge automatically injects the 'x-vercel-ip-country' header
+  // Get geo country from Vercel Edge header (only present on Vercel prod)
+  // In local dev this header is absent, so we default to 'KR' for testing
   const vercelCountry = request.headers.get('x-vercel-ip-country');
-  const country = vercelCountry || 'US'; // Default to global US
+  const country = vercelCountry || 'KR'; // 'KR' default for local dev
 
-  // Next.js middleware returns the modified response headers
-  supabaseResponse.headers.set('x-user-country', country);
+  // Build base response with country header forwarded
+  const response = NextResponse.next();
+  response.headers.set('x-user-country', country);
 
-  // Custom Admin Gating Logic
-  if (request.nextUrl.pathname.startsWith('/admin')) {
+  // --- Geo-routing: Redirect root "/" based on country ---
+  if (pathname === '/') {
+    const targetUrl = country === 'KR'
+      ? new URL('/kr/kr', request.url)
+      : new URL('/gl/en', request.url);
+    return NextResponse.redirect(targetUrl);
+  }
+
+  // --- Admin gating with cookie-based auth ---
+  if (pathname.startsWith('/admin')) {
     const hasMockCookie = request.cookies.has('kokkok_admin_auth');
-    const hasSupabaseCookie = Array.from(request.cookies.getAll()).some(c => c.name.startsWith('sb-') && c.name.endsWith('-auth-token'));
+    const hasSupabaseCookie = Array.from(request.cookies.getAll()).some(
+      c => c.name.startsWith('sb-') && c.name.endsWith('-auth-token')
+    );
     
     if (!hasMockCookie && !hasSupabaseCookie) {
       return NextResponse.redirect(new URL('/login', request.url));
     }
   }
 
-  return supabaseResponse;
+  return response;
 }
 
 export const config = {

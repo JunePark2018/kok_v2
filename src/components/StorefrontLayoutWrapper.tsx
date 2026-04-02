@@ -6,16 +6,18 @@ import Footer from '@/components/Footer';
 
 export default function StorefrontLayoutWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  // Bypass global headers/footers for Admin CMS and Login routes
-  const isAdmin = pathname.startsWith('/admin') || pathname.startsWith('/login');
+  
+  // These routes have their own layouts and don't need the global header/footer
+  const isAdmin = pathname.startsWith('/admin');
+  const isAuth = pathname.startsWith('/login') || pathname.startsWith('/register');
+  // /kr/* and /gl/* routes have their own layouts via the route group layout files
+  const isRegionRoute = pathname.startsWith('/kr/') || pathname.startsWith('/gl/');
 
-  if (isAdmin) return <>{children}</>;
+  if (isAdmin || isAuth || isRegionRoute) return <>{children}</>;
 
   return (
     <div className="flex flex-col min-h-screen font-sans">
-      <Header />
       <main className="flex-1 w-full bg-white">{children}</main>
-      <Footer />
     </div>
   );
 }
