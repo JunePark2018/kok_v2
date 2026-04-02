@@ -1,8 +1,14 @@
 import HeroSlider from '@/components/HeroSlider';
 import ProductGrid from '@/components/ProductGrid';
 import ShortsFeed from '@/components/ShortsFeed';
+import { createClient } from '@supabase/supabase-js';
 
-export default function Home() {
+// Initialize Supabase fallback logic safely for Server Components
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
+
+export default async function Home() {
   const dummyProducts = [
     {
       id: "1",
@@ -42,7 +48,7 @@ export default function Home() {
     }
   ];
 
-  // Placeholder Shorts - Influencer Cosmetic & Skincare Reviews
+  // Placeholder Default Shorts - Influencer Cosmetic & Skincare Reviews
   const verifiedIds = [
     "ho0EhuO3RNs", 
     "lD1VId0ec2s", 
@@ -50,10 +56,26 @@ export default function Home() {
     "yPRcriD4FcM"
   ];
   
-  // Create about 10 shorts for scroll testing
   const dummyShorts = Array.from({ length: 10 }).map((_, i) => 
     `https://www.youtube.com/embed/${verifiedIds[i % verifiedIds.length]}`
   );
+
+  let liveShorts: string[] = [];
+
+  try {
+    if (supabase) {
+       // Attempt to fetch live from Supabase
+       const { data, error } = await supabase.from('shorts').select('youtube_id').order('created_at', { ascending: false }).limit(10);
+       if (!error && data && data.length > 0) {
+         liveShorts = data.map(d => `https://www.youtube.com/embed/${d.youtube_id}`);
+       }
+    }
+  } catch (e) {
+    console.warn("Supabase integration failed or networking error. Falling back to mock data.", e);
+  }
+
+  // Fallback cleanly to mock data to protect Vercel rendering if database disconnects
+  const finalShorts = liveShorts.length > 0 ? liveShorts : dummyShorts;
 
   return (
     <div className="animate-in fade-in duration-1000">
@@ -70,7 +92,7 @@ export default function Home() {
         products={[...dummyProducts].reverse().map(p => ({...p, id: p.id + '_new', name: 'NEW ' + p.name}))} 
       />
 
-      <ShortsFeed shorts={dummyShorts} />
+      <ShortsFeed shorts={finalShorts} />
     </div>
   );
 }

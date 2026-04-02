@@ -1,18 +1,49 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Video, Trash2, Plus } from 'lucide-react';
+import { createClient } from '@supabase/supabase-js';
+
+// Initialize Supabase Client defensively
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+interface Short {
+  id: string;
+  youtubeId: string;
+  addedAt: string;
+}
 
 export default function ShortsAdminPage() {
-  const [shorts, setShorts] = useState([
-    { id: '1', youtubeId: 'ho0EhuO3RNs', addedAt: '2026-04-01' },
-    { id: '2', youtubeId: 'lD1VId0ec2s', addedAt: '2026-04-01' },
-    { id: '3', youtubeId: 'mkBTUDxMKtU', addedAt: '2026-04-02' },
-    { id: '4', youtubeId: 'yPRcriD4FcM', addedAt: '2026-04-02' },
-  ]);
-
+  const [shorts, setShorts] = useState<Short[]>([]);
   const [newUrl, setNewUrl] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleAdd = (e: React.FormEvent) => {
+  // Fetch initial data
+  useEffect(() => {
+    async function fetchShorts() {
+      try {
+        const { data, error } = await supabase.from('shorts').select('*').order('created_at', { ascending: false });
+        if (error || !data) throw error;
+        
+        setShorts(data.map(d => ({ id: d.id, youtubeId: d.youtube_id, addedAt: new Date(d.created_at).toISOString().split('T')[0] })));
+      } catch (e) {
+        console.error("Supabase connection failed. Falling back to mock data.", e);
+        // Fallback Mock Data
+        setShorts([
+          { id: '1', youtubeId: 'ho0EhuO3RNs', addedAt: '2026-04-01' },
+          { id: '2', youtubeId: 'lD1VId0ec2s', addedAt: '2026-04-01' },
+          { id: '3', youtubeId: 'mkBTUDxMKtU', addedAt: '2026-04-02' },
+          { id: '4', youtubeId: 'yPRcriD4FcM', addedAt: '2026-04-02' },
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchShorts();
+  }, []);
+
+  const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newUrl) return;
     
@@ -21,17 +52,44 @@ export default function ShortsAdminPage() {
     const videoId = match ? match[1] : (newUrl.length === 11 ? newUrl : null);
 
     if (videoId) {
-      setShorts([{ id: Date.now().toString(), youtubeId: videoId, addedAt: new Date().toISOString().split('T')[0] }, ...shorts]);
+      // Optimistic UI Update
+      const tempId = Date.now().toString();
+      const newShort = { id: tempId, youtubeId: videoId, addedAt: new Date().toISOString().split('T')[0] };
+      setShorts([newShort, ...shorts]);
       setNewUrl('');
-      alert(`[MOCK SUCCESS] YouTube ID '${videoId}' added! In Phase 2, this will update the Supabase 'public.shorts' table and immediately reflect on the homepage.`);
+
+      // Attempt DB Insert
+      try {
+        const { error } = await supabase.from('shorts').insert([{ youtube_id: videoId }]);
+        if (error) {
+          console.warn("DB Insert failed. Operating in Mock Mode.");
+        } else {
+           alert(`[ADMIN] Success! YouTube ID '${videoId}' is now live on the Homepage.`);
+        }
+      } catch (e) {
+         console.warn("Operating in Mock Mode");
+      }
     } else {
       alert('Invalid YouTube URL or ID');
     }
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
+    // Optimistic Delete
+    const original = [...shorts];
     setShorts(shorts.filter(s => s.id !== id));
+
+    try {
+      const { error } = await supabase.from('shorts').delete().eq('id', id);
+      if (error) {
+         console.warn("DB Delete failed. Operating in Mock Mode.");
+      }
+    } catch {
+       console.warn("DB Delete failed.");
+    }
   };
+
+  if (isLoading) return <div className="p-10 animate-pulse bg-gray-100 rounded-xl h-64 flex items-center justify-center">Loading Live Shorts...</div>;
 
   return (
     <div className="space-y-8">
