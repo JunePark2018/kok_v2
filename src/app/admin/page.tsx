@@ -1,26 +1,38 @@
+import { Users, Package, Video } from 'lucide-react';
+import Link from 'next/link';
+
 export default function AdminDashboard() {
+  const stats = [
+    { title: 'Total Users', value: '1,204', icon: Users, color: 'bg-blue-500', href: '/admin/users' },
+    { title: 'Active Products', value: '12', icon: Package, color: 'bg-green-500', href: '/admin/products' },
+    { title: 'Live Shorts', value: '10', icon: Video, color: 'bg-purple-500', href: '/admin/shorts' },
+  ];
+
   return (
     <div>
-      <h1 className="text-3xl font-bold tracking-tight mb-8">Dashboard Overview</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-neutral-800/50 rounded-xl p-6 border border-neutral-700/50">
-          <h3 className="text-neutral-400 text-sm font-medium">Total Products</h3>
-          <p className="text-3xl font-bold mt-2">0</p>
-        </div>
-        <div className="bg-neutral-800/50 rounded-xl p-6 border border-neutral-700/50">
-          <h3 className="text-neutral-400 text-sm font-medium">Media Assets</h3>
-          <p className="text-3xl font-bold mt-2">0</p>
-        </div>
-        <div className="bg-neutral-800/50 rounded-xl p-6 border border-neutral-700/50">
-          <h3 className="text-neutral-400 text-sm font-medium">Total Orders (Draft)</h3>
-          <p className="text-3xl font-bold mt-2">0</p>
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {stats.map((stat) => {
+          const Icon = stat.icon;
+          return (
+            <Link key={stat.title} href={stat.href} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow group flex items-center">
+              <div className={`w-14 h-14 rounded-lg flex items-center justify-center text-white ${stat.color} shadow-sm group-hover:scale-105 transition-transform`}>
+                <Icon className="w-7 h-7" />
+              </div>
+              <div className="ml-5">
+                <p className="text-sm font-medium text-gray-500">{stat.title}</p>
+                <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+              </div>
+            </Link>
+          );
+        })}
       </div>
-      
-      <div className="mt-8 bg-neutral-800/30 border border-neutral-700/50 rounded-xl p-6">
-        <h2 className="text-xl font-bold mb-4">Recent Activity</h2>
-        <p className="text-neutral-400 text-sm">No recent activity detected.</p>
+
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <h2 className="text-lg font-semibold text-gray-800 mb-4">Welcome to Kokkok Garden Admin</h2>
+        <p className="text-gray-600">
+          This dashboard is currently running in <strong>Mock Mode</strong>. You can navigate through the sidebar to view mock data for Users, Products, and Shorts. 
+          When Phase 2 begins, we will connect these tables directly to your Supabase PostgreSQL database.
+        </p>
       </div>
     </div>
   );
