@@ -1,7 +1,8 @@
 export default function PromoBanner() {
   return (
-    <div className="bg-black text-white text-[11px] font-medium tracking-wide py-1.5 px-4 text-center cursor-pointer hover:bg-neutral-900 transition-colors z-50">
-      <span className="opacity-95">신규 회원가입 시 15% 추가 할인 쿠폰 증정 / 첫 구매 특가 적용! 👉</span>
+    <div className="bg-neutral-900 border-b border-neutral-800 text-white text-[12px] font-medium tracking-wide py-2 px-4 text-center cursor-pointer hover:bg-black transition-colors z-50 flex items-center justify-center space-x-2">
+      <span className="bg-green-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-sm">N</span>
+      <span>지금 가입하고 첫구매 혜택 받아가세요!</span>
     </div>
   );
 }

@@ -6,7 +6,7 @@ import StorefrontLayoutWrapper from '@/components/StorefrontLayoutWrapper';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Kokkok Garden | Anti-Gravity',
+  title: 'Kokkok Garden',
   description: 'Premium Skincare featuring Heartleaf, Jericho Rose, and Sedum.',
 };
 
