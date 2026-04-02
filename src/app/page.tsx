@@ -43,12 +43,17 @@ export default function Home() {
   ];
 
   // Placeholder Shorts - Influencer Cosmetic & Skincare Reviews
-  const dummyShorts = [
-    "https://www.youtube.com/embed/ho0EhuO3RNs", // valid skincare 1
-    "https://www.youtube.com/embed/lD1VId0ec2s", // valid skincare 2
-    "https://www.youtube.com/embed/mkBTUDxMKtU", // valid skincare 3
-    "https://www.youtube.com/embed/yPRcriD4FcM"  // valid skincare 4
+  const verifiedIds = [
+    "ho0EhuO3RNs", 
+    "lD1VId0ec2s", 
+    "mkBTUDxMKtU", 
+    "yPRcriD4FcM"
   ];
+  
+  // Create about 10 shorts for scroll testing
+  const dummyShorts = Array.from({ length: 10 }).map((_, i) => 
+    `https://www.youtube.com/embed/${verifiedIds[i % verifiedIds.length]}`
+  );
 
   return (
     <div className="animate-in fade-in duration-1000">
