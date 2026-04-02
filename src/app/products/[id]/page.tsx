@@ -74,6 +74,9 @@ export default async function ProductDetail({ params }: { params: Promise<{ id: 
         {/* Product Image Gallery Block */}
         <div className="space-y-4">
           <div className="w-full aspect-square bg-[#f8f8f8] flex items-center justify-center overflow-hidden relative">
+            <div className={`absolute left-4 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded z-20 font-mono backdrop-blur-sm ${id.includes('_new') ? 'top-12' : 'top-4'}`}>
+              Target: 800x800 (1:1)
+            </div>
             {id.includes('_new') && (
               <span className="absolute top-4 left-4 bg-[#111111] text-white text-[10px] font-bold px-2 py-1 tracking-widest z-10">NEW</span>
             )}
@@ -113,7 +116,10 @@ export default async function ProductDetail({ params }: { params: Promise<{ id: 
       {/* Brand Story Details Below via long-scroll */}
       <div className="mt-32 pt-20 border-t border-neutral-100 text-center">
         <h2 className="text-xl font-extrabold tracking-widest mb-16 uppercase">Detail view</h2>
-        <div className="w-full max-w-4xl mx-auto aspect-video bg-[#f8f8f8] flex items-center flex-col justify-center text-neutral-400 text-sm space-y-4">
+        <div className="w-full max-w-4xl mx-auto aspect-video bg-[#f8f8f8] flex items-center flex-col justify-center text-neutral-400 text-sm space-y-4 relative">
+           <div className="absolute top-4 left-4 bg-black/70 text-white text-[10px] px-2 py-1 rounded z-10 font-mono backdrop-blur-sm">
+              Target: 1920x1080 (16:9)
+           </div>
            <span className="tracking-widest text-[11px] font-semibold">Premium Visuals Placeholder</span>
         </div>
       </div>

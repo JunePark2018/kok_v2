@@ -14,6 +14,9 @@ export default function ProductCard({ id, name, summary, price, originalPrice, d
   return (
     <Link href={`/products/${id}`} className="group block">
       <div className="relative aspect-square w-full rounded-[16px] overflow-hidden bg-[#F5F5F5] mb-4">
+        <div className="absolute top-2 left-2 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded z-10 font-mono backdrop-blur-sm">
+          Target: 800x800 (1:1)
+        </div>
         <img 
           src={imageUrl} 
           alt={name}
