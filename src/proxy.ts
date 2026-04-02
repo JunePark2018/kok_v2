@@ -15,8 +15,10 @@ export async function proxy(request: NextRequest) {
 
   // Custom Admin Gating Logic
   if (request.nextUrl.pathname.startsWith('/admin')) {
-    const hasAuthCookie = request.cookies.has('kokkok_admin_auth');
-    if (!hasAuthCookie) {
+    const hasMockCookie = request.cookies.has('kokkok_admin_auth');
+    const hasSupabaseCookie = Array.from(request.cookies.getAll()).some(c => c.name.startsWith('sb-') && c.name.endsWith('-auth-token'));
+    
+    if (!hasMockCookie && !hasSupabaseCookie) {
       return NextResponse.redirect(new URL('/login', request.url));
     }
   }
