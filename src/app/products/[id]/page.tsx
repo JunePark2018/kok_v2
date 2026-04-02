@@ -73,9 +73,9 @@ export default async function ProductDetail({ params }: { params: Promise<{ id: 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-24">
         {/* Product Image Gallery Block */}
         <div className="space-y-4">
-          <div className="w-full aspect-square bg-[#f8f8f8] flex items-center justify-center overflow-hidden relative">
+          <div className="w-full aspect-[5/6] bg-[#f8f8f8] flex items-center justify-center overflow-hidden relative">
             <div className={`absolute left-4 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded z-20 font-mono backdrop-blur-sm ${id.includes('_new') ? 'top-12' : 'top-4'}`}>
-              Target: 800x800 (1:1)
+              Target: 1000x1200 (5:6)
             </div>
             {id.includes('_new') && (
               <span className="absolute top-4 left-4 bg-[#111111] text-white text-[10px] font-bold px-2 py-1 tracking-widest z-10">NEW</span>

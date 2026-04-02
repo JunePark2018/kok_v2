@@ -13,9 +13,9 @@ interface ProductCardProps {
 export default function ProductCard({ id, name, summary, price, originalPrice, discountRate, imageUrl }: ProductCardProps) {
   return (
     <Link href={`/products/${id}`} className="group block">
-      <div className="relative aspect-square w-full rounded-[16px] overflow-hidden bg-[#F5F5F5] mb-4">
+      <div className="relative aspect-[5/6] w-full rounded-[16px] overflow-hidden bg-[#F5F5F5] mb-4">
         <div className="absolute top-2 left-2 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded z-10 font-mono backdrop-blur-sm">
-          Target: 800x800 (1:1)
+          Target: 1000x1200 (5:6)
         </div>
         <img 
           src={imageUrl} 

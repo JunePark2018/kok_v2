@@ -70,9 +70,9 @@ export default function HeroSlider() {
 
                 {/* Image */}
                 <div className="absolute right-0 bottom-0 top-0 w-1/2 flex justify-end items-center sm:relative sm:w-auto h-full p-4 sm:p-12 opacity-80 sm:opacity-100">
-                  <div className="relative h-[80%] aspect-[3/4] mr-8 shadow-2xl overflow-hidden rounded-md">
+                  <div className="relative h-[80%] aspect-[5/6] mr-8 shadow-2xl overflow-hidden rounded-md">
                     <div className="absolute top-2 left-2 bg-black/70 text-white text-[11px] px-2 py-1 rounded z-20 font-mono backdrop-blur-sm">
-                      Target: 800x1066 (3:4)
+                      Target: 1000x1200 (5:6)
                     </div>
                     <img 
                       src={slide.image} 

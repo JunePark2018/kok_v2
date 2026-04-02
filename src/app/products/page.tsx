@@ -28,8 +28,11 @@ export default function ProductsList() {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
         {[1,2,3,4,5,6].map((idx) => (
           <Link key={idx} href="/products/1" className="group block">
-            <div className="w-full aspect-[3/4] bg-neutral-100 rounded-lg overflow-hidden relative mb-4 flex items-center justify-center transition-opacity group-hover:opacity-90">
-              {idx === 1 && <span className="absolute top-2 left-2 bg-black text-white text-[10px] font-bold px-2 py-1 z-10 tracking-widest">BEST</span>}
+            <div className="w-full aspect-[5/6] bg-neutral-100 rounded-lg overflow-hidden relative mb-4 flex items-center justify-center transition-opacity group-hover:opacity-90">
+              <div className="absolute top-2 left-2 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded z-20 font-mono backdrop-blur-sm">
+                 Target: 1000x1200 (5:6)
+              </div>
+              {idx === 1 && <span className="absolute top-8 left-2 bg-black text-white text-[10px] font-bold px-2 py-1 z-10 tracking-widest">BEST</span>}
               <span className="text-neutral-300 text-xs text-center px-4 font-mono">Product Visual {idx}</span>
             </div>
             <div className="space-y-1 text-center">
