@@ -27,7 +27,7 @@ export default function Header() {
           {/* Center Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="text-xl sm:text-2xl font-bold tracking-widest text-[#111111] uppercase">
-              PURE BLANC
+              KOKKOK GARDEN
             </Link>
           </div>
 
