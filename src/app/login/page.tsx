@@ -14,8 +14,7 @@ export default function AdminLogin() {
     if (id === 'admin123' && password === '456789123') {
       // Set a simple cookie to simulate auth token
       document.cookie = "kokkok_admin_auth=true; path=/; max-age=86400"; // 1 day expiry
-      router.push('/admin');
-      router.refresh();
+      window.location.href = '/admin';
     } else {
       setError('Invalid User ID or Password.');
     }
