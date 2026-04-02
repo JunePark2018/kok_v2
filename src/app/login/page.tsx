@@ -7,7 +7,6 @@ export default function AdminLogin() {
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const router = useRouter();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,49 +20,51 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 flex items-center justify-center text-white p-4">
-      <div className="w-full max-w-sm bg-neutral-900 border border-neutral-800 rounded-2xl p-8 shadow-2xl">
-        <div className="w-12 h-12 bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-6 flex-shrink-0">
-          <Lock className="w-5 h-5 text-neutral-400" />
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center font-sans px-4 animate-in fade-in duration-500">
+      <div className="w-full max-w-sm">
+        
+        <div className="text-center mb-10">
+          <div className="w-12 h-12 border border-gray-200 rounded-full flex items-center justify-center mx-auto mb-6 flex-shrink-0 bg-gray-50">
+            <Lock className="w-5 h-5 text-[#111111]" />
+          </div>
+          <h1 className="text-2xl font-extrabold tracking-tight text-[#111111] mb-2 uppercase">Admin Portal</h1>
+          <p className="text-sm text-gray-500">Sign in to manage Kokkok Garden storefront.</p>
         </div>
         
-        <h1 className="text-2xl font-bold tracking-tight text-center mb-2">Admin Login</h1>
-        <p className="text-sm text-neutral-400 text-center mb-8">Access the Kokkok Garden CMS</p>
-        
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-neutral-300 mb-1">User ID</label>
-            <input 
-              type="text" 
-              value={id}
-              onChange={(e) => setId(e.target.value)}
-              placeholder="e.g. admin123"
-              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2 focus:outline-none focus:border-neutral-600 transition text-sm text-white" 
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-neutral-300 mb-1">Password</label>
-            <input 
-              type="password" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2 focus:outline-none focus:border-neutral-600 transition text-sm text-white" 
-            />
+        <form onSubmit={handleLogin} className="space-y-6">
+          <div className="space-y-4">
+            <div>
+              <input 
+                type="text" 
+                value={id}
+                onChange={(e) => setId(e.target.value)}
+                placeholder="User ID (admin123)"
+                className="w-full bg-white border-b border-gray-200 px-2 py-3 focus:outline-none focus:border-black transition text-sm text-[#111111] placeholder:text-gray-400" 
+              />
+            </div>
+            <div>
+              <input 
+                type="password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                className="w-full bg-white border-b border-gray-200 px-2 py-3 focus:outline-none focus:border-black transition text-sm text-[#111111] placeholder:text-gray-400" 
+              />
+            </div>
           </div>
 
-          {error && <p className="text-red-400 text-xs font-semibold text-center pt-2">{error}</p>}
+          {error && <p className="text-red-500 text-xs font-bold text-center">{error}</p>}
 
           <button 
             type="submit" 
-            className="w-full bg-white text-black py-2.5 rounded-lg font-medium text-sm hover:bg-neutral-200 transition mt-4"
+            className="w-full bg-[#111111] text-white py-4 rounded-none font-bold tracking-widest text-[13px] hover:bg-black hover:shadow-lg transition-all mt-8"
           >
-            Sign In
+            SIGN IN
           </button>
         </form>
         
-        <div className="mt-6 text-center">
-           <p className="text-xs text-neutral-500">Secured via Custom Next.js Auth Middleware</p>
+        <div className="mt-12 text-center border-t border-gray-100 pt-6">
+           <p className="text-[11px] font-semibold text-gray-400 tracking-widest uppercase">Secured via Custom Auth Middleware</p>
         </div>
       </div>
     </div>
