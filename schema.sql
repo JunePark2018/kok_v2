@@ -16,8 +16,11 @@ CREATE TABLE public.users (
 CREATE TABLE public.products (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
   name text NOT NULL,
+  summary text,
+  ingredient text,
   description text,
   price numeric NOT NULL DEFAULT 0,
+  original_price numeric,
   images text[] DEFAULT '{}',
   naver_store_url text,
   is_active boolean DEFAULT true,

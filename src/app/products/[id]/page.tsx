@@ -1,53 +1,16 @@
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import ProductActionButtons from '@/components/ProductActionButtons';
-
-// Mock Product Catalog matching the homepage IDs
-const PROD_CATALOG: Record<string, any> = {
-  "1": {
-    name: "레티놀 바운스 세럼",
-    summary: "끈적임없이 촉촉한 기능성 세럼",
-    price: 23400,
-    originalPrice: 26000,
-    imageUrl: "https://plus.unsplash.com/premium_photo-1681996500858-ff9cc3f28203?w=800&q=80&auto=format&fit=crop",
-    ingredient: "RETINOL",
-    description: "순수 레티놀을 안정화하여 민감한 피부도 안심하고 사용할 수 있는 데일리 기능성 탄력 세럼입니다. 탱탱한 마무리감을 선사합니다."
-  },
-  "2": {
-    name: "EGF 글로우 젤리 세럼",
-    summary: "탱글한 젤리로 피부 탄성 회복 케어",
-    price: 23400,
-    originalPrice: 26000,
-    imageUrl: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=800&q=80&auto=format&fit=crop",
-    ingredient: "EGF & PEPTIDE",
-    description: "고순도 EGF 성분이 피부 본연의 힘을 길러주고, 촉촉한 젤리 제형이 빈틈없이 수분을 채워줍니다."
-  },
-  "3": {
-    name: "액티브 리커버리 크림",
-    summary: "트러블 부터 자극 진정까지 하나로!",
-    price: 23400,
-    originalPrice: 26000,
-    imageUrl: "https://plus.unsplash.com/premium_photo-1675842663249-a8b70126afbc?w=800&q=80&auto=format&fit=crop",
-    ingredient: "CICA & PANTHENOL",
-    description: "시카와 판테놀이 배합되어 예민해진 피부를 빠르게 진정시키고 장벽을 탄탄하게 회복시켜 줍니다."
-  },
-  "4": {
-    name: "퓨어 클렌징 오일",
-    summary: "블랙헤드를 녹이는 클렌징 오일",
-    price: 26000,
-    originalPrice: 38000,
-    imageUrl: "https://images.unsplash.com/photo-1608248593842-b062b0afdf93?w=800&q=80&auto=format&fit=crop",
-    ingredient: "JOJOBA OIL",
-    description: "부드럽게 롤링되어 모공 속 화이트헤드와 블랙헤드를 깨끗하게 녹여내는 산뜻한 포뮬러의 클렌징 오일입니다."
-  }
-};
+import { getProducts } from '@/lib/api/products';
 
 export default async function ProductDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   
   // Resolve base id if it's a "NEW " appended item from homepage
   const baseId = id.replace('_new', '');
-  const productData = PROD_CATALOG[baseId];
+  
+  const allProducts = await getProducts();
+  const productData = allProducts.find(p => p.id === baseId);
 
   if (!productData) {
     return (
