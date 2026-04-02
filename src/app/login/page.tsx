@@ -10,9 +10,9 @@ export default function AdminLogin() {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (id === 'admin123' && password === '456789123') {
+    if (id.trim() === 'admin123' && password.trim() === '456789123') {
       // Set a simple cookie to simulate auth token
-      document.cookie = "kokkok_admin_auth=true; path=/; max-age=86400"; // 1 day expiry
+      document.cookie = "kokkok_admin_auth=true; path=/; max-age=86400; Secure; SameSite=Lax"; // 1 day expiry
       window.location.href = '/admin';
     } else {
       setError('Invalid User ID or Password.');
