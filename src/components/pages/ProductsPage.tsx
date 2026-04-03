@@ -2,8 +2,8 @@ import Link from 'next/link';
 import { Filter } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import { getProducts } from '@/lib/api/products';
+import { translateProductsBatch } from '@/lib/openai';
 
-// i18n labels
 const labels: Record<string, {
   title: string; sub: string; all: string; heartleaf: string;
   jericho: string; sedum: string; count: string; filter: string;
@@ -31,10 +31,19 @@ export default async function ProductsPage({ lang, region, canPurchase }: Props)
   const calculateDiscount = (price: number, original: number) =>
     original > price ? Math.round(((original - price) / original) * 100) : 0;
 
+  // Batch-translate product names + summaries for non-Korean languages
+  let translations: Record<string, { name: string; summary: string }> = {};
+  if (lang !== 'kr' && activeProducts.length > 0) {
+    translations = await translateProductsBatch(
+      lang,
+      activeProducts.map(p => ({ id: p.id, name: p.name, summary: p.summary }))
+    );
+  }
+
   const formattedProducts = activeProducts.map(p => ({
     id: p.id,
-    name: p.name,
-    summary: p.summary,
+    name:    translations[p.id]?.name    ?? p.name,
+    summary: translations[p.id]?.summary ?? p.summary,
     price: p.price,
     originalPrice: p.originalPrice,
     discountRate: calculateDiscount(p.price, p.originalPrice),

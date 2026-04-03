@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import ProductActionButtons from '@/components/ProductActionButtons';
 import { getProducts } from '@/lib/api/products';
+import { translateProduct } from '@/lib/openai';
 
 const labels: Record<string, {
   home: string; shop: string; details: string; notFound: string;
@@ -39,6 +40,24 @@ export default async function ProductDetailPage({ lang, region, canPurchase, id 
     );
   }
 
+  // Auto-translate product fields with GPT-4o mini for non-Korean languages.
+  // Falls back to original Korean if API key missing or call fails.
+  const translated = lang !== 'kr'
+    ? await translateProduct(
+        productData.id,
+        lang,
+        productData.name,
+        productData.summary,
+        productData.description,
+        productData.ingredient
+      )
+    : {
+        name:        productData.name,
+        summary:     productData.summary,
+        description: productData.description,
+        ingredient:  productData.ingredient,
+      };
+
   const discountPct = productData.originalPrice > productData.price
     ? Math.round((productData.originalPrice - productData.price) / productData.originalPrice * 100)
     : 0;
@@ -51,9 +70,9 @@ export default async function ProductDetailPage({ lang, region, canPurchase, id 
         <ChevronRight className="w-3 h-3 mx-2" />
         <Link href={`/${region}/${lang}/products`} className="hover:text-black transition-colors">{lb.shop}</Link>
         <ChevronRight className="w-3 h-3 mx-2" />
-        <span className="text-[#111111]">{productData.ingredient || productData.name}</span>
+        <span className="text-[#111111]">{translated.ingredient || translated.name}</span>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-24">
         {/* Product Image */}
         <div className="space-y-4">
@@ -61,7 +80,7 @@ export default async function ProductDetailPage({ lang, region, canPurchase, id 
             {productData.imageUrl ? (
               <img
                 src={productData.imageUrl}
-                alt={productData.name}
+                alt={translated.name}
                 className="w-full h-full object-cover mix-blend-multiply"
               />
             ) : (
@@ -72,12 +91,12 @@ export default async function ProductDetailPage({ lang, region, canPurchase, id 
 
         {/* Product Info */}
         <div className="flex flex-col pt-4">
-          {productData.ingredient && (
-            <p className="text-[11px] font-bold tracking-widest text-neutral-400 mb-3 uppercase">{productData.ingredient}</p>
+          {translated.ingredient && (
+            <p className="text-[11px] font-bold tracking-widest text-neutral-400 mb-3 uppercase">{translated.ingredient}</p>
           )}
-          <h1 className="text-3xl lg:text-4xl font-extrabold tracking-tight text-[#111111] mb-4">{productData.name}</h1>
-          <p className="text-neutral-500 text-sm font-medium mb-8 leading-relaxed">{productData.summary}</p>
-          
+          <h1 className="text-3xl lg:text-4xl font-extrabold tracking-tight text-[#111111] mb-4">{translated.name}</h1>
+          <p className="text-neutral-500 text-sm font-medium mb-8 leading-relaxed">{translated.summary}</p>
+
           <div className="flex items-end gap-3 mb-10 pb-8 border-b border-neutral-100">
             {discountPct > 0 && (
               <span className="text-[#f15a24] font-bold text-lg mb-0.5 tracking-tight">{discountPct}%</span>
@@ -91,11 +110,11 @@ export default async function ProductDetailPage({ lang, region, canPurchase, id 
               </span>
             )}
           </div>
-          
-          {productData.description && (
+
+          {translated.description && (
             <div className="space-y-4 mb-8">
               <h3 className="text-[12px] font-bold tracking-widest text-[#111111]">{lb.details}</h3>
-              <p className="text-neutral-600 text-[14px] leading-loose break-keep">{productData.description}</p>
+              <p className="text-neutral-600 text-[14px] leading-loose break-keep">{translated.description}</p>
             </div>
           )}
 
@@ -114,8 +133,8 @@ export default async function ProductDetailPage({ lang, region, canPurchase, id 
           ) : null}
         </div>
       </div>
-      
-      {/* Detail image placeholder */}
+
+      {/* Detail image area */}
       <div className="mt-24 pt-16 border-t border-neutral-100 text-center">
         <h2 className="text-lg font-extrabold tracking-widest mb-12 uppercase">{lb.detailView}</h2>
         <div className="w-full max-w-3xl mx-auto aspect-video bg-[#f8f8f8] flex items-center justify-center text-neutral-400 text-sm rounded-lg">
