@@ -58,7 +58,8 @@ ${JSON.stringify(fields, null, 2)}`;
   });
 
   if (!res.ok) {
-    console.warn('[translate] OpenAI API error', res.status);
+    const errText = await res.text().catch(() => 'No error body');
+    console.warn(`[translate] OpenAI API error ${res.status}: ${errText}`);
     return fields;
   }
 
@@ -78,7 +79,6 @@ ${JSON.stringify(fields, null, 2)}`;
 }
 
 // Cached wrapper – stores translation in Next.js data cache for 24 hours
-// Key: productId + targetLang (plus all input fields so stale DB edits bust cache)
 export const translateProduct = unstable_cache(
   async (
     _productId: string,
@@ -88,9 +88,10 @@ export const translateProduct = unstable_cache(
     description: string,
     ingredient: string
   ): Promise<TranslatableProduct> => {
+    console.log(`[translate] Translating product ${_productId} to ${lang} (Key preset: ${!!OPENAI_API_KEY})`);
     return callOpenAI({ name, summary, description, ingredient }, lang);
   },
-  ['openai-product-translation'],
+  ['openai-product-translation-v2'], // Version 2 cache bust
   { revalidate: 60 * 60 * 24 } // 24-hour cache
 );
 
@@ -159,8 +160,9 @@ export const translateProductsBatch = unstable_cache(
     lang: string,
     products: Array<{ id: string; name: string; summary: string }>
   ): Promise<Record<string, { name: string; summary: string }>> => {
+    console.log(`[translate-batch] Translating ${products.length} products to ${lang} (Key preset: ${!!OPENAI_API_KEY})`);
     return callOpenAIBatch(products, lang);
   },
-  ['openai-products-batch-translation'],
+  ['openai-products-batch-translation-v2'], // Version 2 cache bust
   { revalidate: 60 * 60 * 24 } // 24-hour cache
 );
