@@ -108,6 +108,37 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
+
+-- ============================================================
+-- 6. Supabase Storage: Product Images Bucket
+-- Run this in your Supabase SQL editor AFTER running the above.
+-- Or create the bucket via Supabase Dashboard > Storage.
+-- ============================================================
+
+-- Create a public storage bucket for product images
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('product-images', 'product-images', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Allow anyone to READ (GET) images
+CREATE POLICY "Public product images read" ON storage.objects
+  FOR SELECT USING (bucket_id = 'product-images');
+
+-- Allow authenticated (admin) users to INSERT images
+CREATE POLICY "Admin product images upload" ON storage.objects
+  FOR INSERT WITH CHECK (
+    bucket_id = 'product-images'
+    AND auth.role() = 'authenticated'
+  );
+
+-- Allow authenticated (admin) users to DELETE images
+CREATE POLICY "Admin product images delete" ON storage.objects
+  FOR DELETE USING (
+    bucket_id = 'product-images'
+    AND auth.role() = 'authenticated'
+  );
+
