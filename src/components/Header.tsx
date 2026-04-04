@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { Search, ShoppingBag, User, Menu, X, Globe } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/context';
 import LanguagePicker from '@/components/LanguagePicker';
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { supabase } from '@/lib/api/products';
 
 interface HeaderProps {
   canPurchase?: boolean;
@@ -73,9 +74,25 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
   const { lang } = useI18n();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [navPages, setNavPages] = useState<{ slug: string; title: string }[]>([]);
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isAdmin = useMemo(() => typeof document !== 'undefined' && document.cookie.includes('kokkok_admin_auth=true'), []);
+
+  const fetchNavPages = useCallback(async () => {
+    try {
+      if (!supabase) return;
+      const { data } = await supabase
+        .from('pages')
+        .select('slug, title')
+        .eq('show_in_nav', true)
+        .eq('is_published', true)
+        .order('nav_order', { ascending: true });
+      if (data) setNavPages(data);
+    } catch { /* ignore */ }
+  }, []);
+
+  useEffect(() => { fetchNavPages(); }, [fetchNavPages]);
   const util = UTILITY[lang] ?? UTILITY['en'];
   const nav = NAV_LABELS[lang] ?? NAV_LABELS['en'];
   const productMega = PRODUCT_MEGA[lang] ?? PRODUCT_MEGA['en'];
@@ -163,20 +180,16 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
                 )}
               </div>
 
-              {/* EVENT & NOTICE */}
-              <Link href={`/${region}/${lang}/events`} className="px-4 h-full flex items-center text-[13.5px] font-semibold text-neutral-800 hover:text-black tracking-wide transition-colors">
-                {nav.event}
-              </Link>
-
-              {/* BRAND STORY */}
-              <Link href={`/${region}/${lang}/brand`} className="px-4 h-full flex items-center text-[13.5px] font-semibold text-neutral-800 hover:text-black tracking-wide transition-colors">
-                {nav.brand}
-              </Link>
-
-              {/* REVIEW */}
-              <Link href={`/${region}/${lang}/reviews`} className="px-4 h-full flex items-center text-[13.5px] font-semibold text-neutral-800 hover:text-black tracking-wide transition-colors">
-                {nav.review}
-              </Link>
+              {/* Dynamic CMS pages from DB */}
+              {navPages.map(page => (
+                <Link
+                  key={page.slug}
+                  href={`/${region}/${lang}/pages/${page.slug}`}
+                  className="px-4 h-full flex items-center text-[13.5px] font-semibold text-neutral-800 hover:text-black tracking-wide transition-colors"
+                >
+                  {page.title}
+                </Link>
+              ))}
 
               {/* Global & CS — dropdown */}
               <div
@@ -269,9 +282,9 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
         {mobileOpen && (
           <div className="lg:hidden bg-white border-t border-neutral-100 px-6 py-4 space-y-4 animate-in slide-in-from-top-2 duration-200">
             <Link href={`/${region}/${lang}/products`} className="block text-sm font-bold text-neutral-800 py-2 border-b border-neutral-100" onClick={() => setMobileOpen(false)}>{nav.product}</Link>
-            <Link href={`/${region}/${lang}/events`} className="block text-sm font-bold text-neutral-800 py-2 border-b border-neutral-100" onClick={() => setMobileOpen(false)}>{nav.event}</Link>
-            <Link href={`/${region}/${lang}/brand`} className="block text-sm font-bold text-neutral-800 py-2 border-b border-neutral-100" onClick={() => setMobileOpen(false)}>{nav.brand}</Link>
-            <Link href={`/${region}/${lang}/reviews`} className="block text-sm font-bold text-neutral-800 py-2 border-b border-neutral-100" onClick={() => setMobileOpen(false)}>{nav.review}</Link>
+            {navPages.map(page => (
+              <Link key={page.slug} href={`/${region}/${lang}/pages/${page.slug}`} className="block text-sm font-bold text-neutral-800 py-2 border-b border-neutral-100" onClick={() => setMobileOpen(false)}>{page.title}</Link>
+            ))}
             <Link href={`/${region}/${lang}/worldwide`} className="flex items-center gap-2 text-sm font-bold text-neutral-800 py-2 border-b border-neutral-100" onClick={() => setMobileOpen(false)}>
               <Globe className="w-4 h-4" /> {nav.worldwide}
             </Link>
