@@ -20,13 +20,25 @@ interface Props {
   lang: string;
   region: 'kr' | 'gl';
   canPurchase: boolean;
+  searchQuery?: string;
 }
 
-export default async function ProductsPage({ lang, region, canPurchase }: Props) {
+export default async function ProductsPage({ lang, region, canPurchase, searchQuery }: Props) {
   const lb = labels[lang] ?? labels['en'];
 
   const allProducts = await getProducts();
-  const activeProducts = allProducts.filter(p => p.is_active);
+  let activeProducts = allProducts.filter(p => p.is_active);
+
+  // Search filter
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    activeProducts = activeProducts.filter(p =>
+      p.name.toLowerCase().includes(q) ||
+      p.summary.toLowerCase().includes(q) ||
+      p.ingredient.toLowerCase().includes(q) ||
+      p.description.toLowerCase().includes(q)
+    );
+  }
 
   const calculateDiscount = (price: number, original: number) =>
     original > price ? Math.round(((original - price) / original) * 100) : 0;
@@ -74,11 +86,29 @@ export default async function ProductsPage({ lang, region, canPurchase }: Props)
         </button>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-        {formattedProducts.map(p => (
-          <ProductCard key={p.id} {...p} canPurchase={canPurchase} />
-        ))}
-      </div>
+      {searchQuery && (
+        <div className="mb-6 flex items-center gap-2">
+          <span className="text-sm text-neutral-500">
+            {lang === 'kr' ? `"${searchQuery}" 검색 결과` : `Results for "${searchQuery}"`}
+          </span>
+          <Link href={`/${region}/${lang}/products`} className="text-xs text-neutral-400 hover:text-black underline underline-offset-2">
+            {lang === 'kr' ? '초기화' : 'Clear'}
+          </Link>
+        </div>
+      )}
+
+      {formattedProducts.length === 0 ? (
+        <div className="py-20 text-center text-neutral-400">
+          <p className="text-lg font-semibold">{lang === 'kr' ? '검색 결과가 없습니다' : 'No products found'}</p>
+          <p className="text-sm mt-2">{lang === 'kr' ? '다른 키워드로 검색해보세요.' : 'Try a different keyword.'}</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+          {formattedProducts.map(p => (
+            <ProductCard key={p.id} {...p} canPurchase={canPurchase} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

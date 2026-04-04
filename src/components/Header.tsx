@@ -74,6 +74,9 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
   const { lang } = useI18n();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [navPages, setNavPages] = useState<{ slug: string; title: Record<string, string> }[]>([]);
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -110,6 +113,17 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
   };
 
   useEffect(() => () => { if (hoverTimer.current) clearTimeout(hoverTimer.current); }, []);
+
+  useEffect(() => {
+    if (searchOpen && searchInputRef.current) searchInputRef.current.focus();
+  }, [searchOpen]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    setSearchOpen(false);
+    window.location.href = `/${region}/${lang}/products?q=${encodeURIComponent(searchQuery.trim())}`;
+  };
 
   return (
     <>
@@ -236,7 +250,7 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
 
             {/* ── Right Icons ──────────────────────────────────────────── */}
             <div className="ml-auto flex items-center gap-2">
-              <button className="p-2 text-neutral-900 hover:opacity-60 transition-opacity" aria-label="Search">
+              <button onClick={() => setSearchOpen(v => !v)} className="p-2 text-neutral-900 hover:opacity-60 transition-opacity" aria-label="Search">
                 <Search className="w-[21px] h-[21px]" />
               </button>
               <Link href="/login" className="hidden sm:flex p-2 text-neutral-900 hover:opacity-60 transition-opacity" aria-label="Account">
@@ -295,6 +309,28 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
               <Link href="/login" onClick={() => setMobileOpen(false)}>{util.login}</Link>
               <Link href="/register" onClick={() => setMobileOpen(false)}>{util.join}</Link>
             </div>
+          </div>
+        )}
+        {/* ── Search Overlay ─────────────────────────────────────────── */}
+        {searchOpen && (
+          <div className="absolute top-full left-0 w-full bg-white border-t border-neutral-100 shadow-lg z-40 animate-in fade-in slide-in-from-top-1 duration-150">
+            <form onSubmit={handleSearch} className="max-w-[1600px] mx-auto px-4 sm:px-8 py-4 flex items-center gap-3">
+              <Search className="w-5 h-5 text-neutral-400 flex-shrink-0" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder={lang === 'kr' ? '상품명, 성분, 키워드 검색...' : 'Search products...'}
+                className="flex-1 text-sm bg-transparent outline-none placeholder:text-neutral-400"
+              />
+              <button type="submit" className="px-4 py-2 bg-[#111111] text-white text-xs font-bold tracking-widest rounded hover:bg-black transition-colors">
+                {lang === 'kr' ? '검색' : 'Search'}
+              </button>
+              <button type="button" onClick={() => { setSearchOpen(false); setSearchQuery(''); }} className="p-1.5 text-neutral-400 hover:text-black transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </form>
           </div>
         )}
       </header>
