@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Users, Package, Video, LayoutDashboard, LogOut } from 'lucide-react';
+import { Users, Package, Video, LayoutDashboard, LogOut, FileText } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -12,6 +12,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: '사용자', href: '/admin/users', icon: Users },
     { name: '상품 관리', href: '/admin/products', icon: Package },
     { name: '숏츠', href: '/admin/shorts', icon: Video },
+    { name: '페이지 관리', href: '/admin/pages', icon: FileText },
   ];
 
   const pageTitle: Record<string, string> = {
@@ -19,6 +20,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     '/admin/users': '사용자 관리',
     '/admin/products': '상품 관리',
     '/admin/shorts': '숏츠 관리',
+    '/admin/pages': '페이지 관리',
   };
 
   return (

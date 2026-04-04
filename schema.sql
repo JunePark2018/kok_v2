@@ -59,6 +59,18 @@ CREATE TABLE public.shorts (
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+CREATE TABLE public.pages (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  slug text UNIQUE NOT NULL,
+  title text NOT NULL,
+  content text DEFAULT '',
+  is_published boolean DEFAULT false,
+  show_in_nav boolean DEFAULT false,
+  nav_order integer DEFAULT 0,
+  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
 -- 3. Enable Row Level Security (RLS)
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
@@ -66,6 +78,7 @@ ALTER TABLE public.media_stories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.cart_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.shorts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.pages ENABLE ROW LEVEL SECURITY;
 
 -- 4. Create RLS Policies
 
@@ -116,6 +129,14 @@ CREATE POLICY "Shorts are viewable by everyone" ON public.shorts
 
 -- SHORTS: Insertable/deletable by anyone (anon key for admin mock auth)
 CREATE POLICY "Shorts are manageable" ON public.shorts
+  FOR ALL USING (true);
+
+-- PAGES: Readable by everyone
+CREATE POLICY "Pages are viewable by everyone" ON public.pages
+  FOR SELECT USING (true);
+
+-- PAGES: Manageable by anyone (admin mock auth)
+CREATE POLICY "Pages are manageable" ON public.pages
   FOR ALL USING (true);
 
 -- 5. Trigger for syncing auth.users to public.users
