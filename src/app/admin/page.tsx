@@ -100,23 +100,6 @@ export default function AdminDashboard() {
         })}
       </div>
 
-      {/* Info */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <h2 className="text-lg font-semibold text-gray-800 mb-4">콕콕가든 관리자 포털</h2>
-        <p className="text-gray-600 text-sm">
-          사이드바를 통해 상품, 숏츠를 관리할 수 있습니다. 상품 추가 시 네이버 스토어 URL을 입력하면 고객이 바로 네이버 스토어에서 구매할 수 있습니다.
-        </p>
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="border border-gray-100 rounded-lg p-4 bg-gray-50/50">
-            <p className="text-sm font-semibold text-gray-700 mb-1">지역 라우팅</p>
-            <p className="text-xs text-gray-500">한국 방문자 → /kr/kr (구매 가능)<br/>해외 방문자 → /gl/en (열람 전용 + AI 챗봇)</p>
-          </div>
-          <div className="border border-gray-100 rounded-lg p-4 bg-gray-50/50">
-            <p className="text-sm font-semibold text-gray-700 mb-1">다국어 지원</p>
-            <p className="text-xs text-gray-500">한국어, 영어, 중국어, 일본어, 베트남어, 태국어<br/>상품 정보 GPT 자동 번역 (24시간 캐시)</p>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
