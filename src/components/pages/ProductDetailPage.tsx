@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import ProductActionButtons from '@/components/ProductActionButtons';
+import RecentViewTracker from '@/components/RecentViewTracker';
 import { getProducts } from '@/lib/api/products';
 import { translateProduct } from '@/lib/openai';
 
@@ -64,6 +65,7 @@ export default async function ProductDetailPage({ lang, region, canPurchase, id 
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16 animate-in fade-in duration-500 bg-white">
+      <RecentViewTracker productId={id} name={productData.name} price={productData.price} originalPrice={productData.originalPrice} imageUrl={productData.imageUrl} />
       {/* Breadcrumb */}
       <div className="flex items-center text-[11px] font-semibold text-neutral-400 mb-10 tracking-widest flex-wrap gap-y-1">
         <Link href={`/${region}/${lang}`} className="hover:text-black transition-colors">{lb.home}</Link>
