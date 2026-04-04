@@ -19,9 +19,8 @@ const L: Record<string, { title: string; subtitle: string; email: string; passwo
 
 function detectLang(): string {
   if (typeof window === 'undefined') return 'kr';
-  const path = window.location.pathname;
-  const match = path.match(/\/(kr|en|cn|jp|vn|th)/);
-  if (match) return match[1];
+  const cookie = document.cookie.match(/kokkok_lang=(\w+)/);
+  if (cookie && ['kr','en','cn','jp','vn','th'].includes(cookie[1])) return cookie[1];
   const nav = navigator.language.toLowerCase();
   if (nav.startsWith('ko')) return 'kr';
   if (nav.startsWith('zh')) return 'cn';
