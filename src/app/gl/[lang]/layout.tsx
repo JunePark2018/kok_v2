@@ -6,6 +6,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AIChatbot from '@/components/AIChatbot';
 import PromoBanner from '@/components/PromoBanner';
+import PageTracker from '@/components/PageTracker';
 
 export const metadata: Metadata = {
   title: 'Kokkok Garden — Global',
@@ -34,6 +35,7 @@ export default async function GlLangLayout({
         <Footer />
         {/* AI Chatbot — Global only */}
         <AIChatbot />
+        <PageTracker />
       </div>
     </I18nProvider>
   );

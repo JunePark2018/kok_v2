@@ -5,6 +5,7 @@ import { I18nProvider } from '@/lib/i18n/context';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import PromoBanner from '@/components/PromoBanner';
+import PageTracker from '@/components/PageTracker';
 
 export const metadata: Metadata = {
   title: 'Kokkok Garden — Korea',
@@ -31,6 +32,7 @@ export default async function KrLangLayout({
         <Header canPurchase={true} region="kr" />
         <main className="flex-1 w-full bg-white">{children}</main>
         <Footer />
+        <PageTracker />
       </div>
     </I18nProvider>
   );

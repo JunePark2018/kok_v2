@@ -79,6 +79,14 @@ CREATE TABLE public.wishlist (
   UNIQUE(user_id, product_id)
 );
 
+CREATE TABLE public.analytics (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  country text,
+  path text,
+  referrer text,
+  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
 -- 3. Enable Row Level Security (RLS)
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
@@ -88,6 +96,7 @@ ALTER TABLE public.cart_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.shorts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.pages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.wishlist ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.analytics ENABLE ROW LEVEL SECURITY;
 
 -- 4. Create RLS Policies
 
