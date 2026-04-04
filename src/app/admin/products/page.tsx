@@ -131,9 +131,14 @@ export default function ProductsAdminPage() {
     try {
       let finalImageUrl = formData.imageUrl;
 
-      // If a file was selected, upload it first
+      // If a file was selected, try to upload (skip on failure)
       if (formData.imageFile) {
-        finalImageUrl = await uploadImageToSupabase(formData.imageFile);
+        try {
+          finalImageUrl = await uploadImageToSupabase(formData.imageFile);
+        } catch (uploadErr) {
+          console.warn('이미지 업로드 실패, 상품은 이미지 없이 저장합니다:', uploadErr);
+          finalImageUrl = '';
+        }
       }
 
       const newProduct: Product = {
@@ -160,7 +165,7 @@ export default function ProductsAdminPage() {
           price: Number(formData.price),
           original_price: Number(formData.originalPrice || formData.price),
           description: formData.description,
-          images: [finalImageUrl],
+          images: finalImageUrl ? [finalImageUrl] : [],
           is_active: true,
           naver_store_url: formData.naverStoreUrl || null
         }]);
@@ -459,7 +464,7 @@ export default function ProductsAdminPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={isSubmitting || (!formData.imageFile && !formData.imageUrl)}
+                  disabled={isSubmitting}
                   className="bg-[#111111] text-white px-8 py-2.5 rounded text-sm font-bold tracking-widest hover:bg-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   {isSubmitting ? (
