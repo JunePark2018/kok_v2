@@ -74,7 +74,7 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
   const { lang } = useI18n();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [navPages, setNavPages] = useState<{ slug: string; title: string }[]>([]);
+  const [navPages, setNavPages] = useState<{ slug: string; title: Record<string, string> }[]>([]);
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isAdmin = useMemo(() => typeof document !== 'undefined' && document.cookie.includes('kokkok_admin_auth=true'), []);
@@ -187,7 +187,7 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
                   href={`/${region}/${lang}/pages/${page.slug}`}
                   className="px-4 h-full flex items-center text-[13.5px] font-semibold text-neutral-800 hover:text-black tracking-wide transition-colors"
                 >
-                  {page.title}
+                  {page.title?.[lang] || page.title?.kr || page.title?.en || ''}
                 </Link>
               ))}
 
@@ -283,7 +283,7 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
           <div className="lg:hidden bg-white border-t border-neutral-100 px-6 py-4 space-y-4 animate-in slide-in-from-top-2 duration-200">
             <Link href={`/${region}/${lang}/products`} className="block text-sm font-bold text-neutral-800 py-2 border-b border-neutral-100" onClick={() => setMobileOpen(false)}>{nav.product}</Link>
             {navPages.map(page => (
-              <Link key={page.slug} href={`/${region}/${lang}/pages/${page.slug}`} className="block text-sm font-bold text-neutral-800 py-2 border-b border-neutral-100" onClick={() => setMobileOpen(false)}>{page.title}</Link>
+              <Link key={page.slug} href={`/${region}/${lang}/pages/${page.slug}`} className="block text-sm font-bold text-neutral-800 py-2 border-b border-neutral-100" onClick={() => setMobileOpen(false)}>{page.title?.[lang] || page.title?.kr || page.title?.en || ''}</Link>
             ))}
             <Link href={`/${region}/${lang}/worldwide`} className="flex items-center gap-2 text-sm font-bold text-neutral-800 py-2 border-b border-neutral-100" onClick={() => setMobileOpen(false)}>
               <Globe className="w-4 h-4" /> {nav.worldwide}
