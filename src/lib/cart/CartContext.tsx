@@ -89,8 +89,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 }
 
+const fallback: CartContextValue = {
+  items: [],
+  addItem: () => {},
+  updateQuantity: () => {},
+  removeItem: () => {},
+  clearCart: () => {},
+  totalCount: 0,
+  totalPrice: 0,
+};
+
 export function useCart() {
   const ctx = useContext(CartContext);
-  if (!ctx) throw new Error('useCart must be used within CartProvider');
-  return ctx;
+  return ctx ?? fallback;
 }
