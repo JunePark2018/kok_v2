@@ -62,12 +62,12 @@ const PRODUCT_MEGA: Record<string, { label: string; items: { name: string; slug:
 };
 
 const NAV_LABELS: Record<string, { product: string; event: string; brand: string; review: string; global: string; worldwide: string; contact: string }> = {
-  kr: { product: 'Product', event: 'EVENT & NOTICE', brand: 'BRAND STORY', review: 'REVIEW & COMMUNITY', global: 'Global & CS', worldwide: 'SHOP Worldwide', contact: '고객센터' },
-  en: { product: 'Product', event: 'EVENT & NOTICE', brand: 'BRAND STORY', review: 'REVIEWS', global: 'Global & CS', worldwide: 'SHOP Worldwide', contact: 'Contact' },
-  cn: { product: '商品', event: '活动 & 通知', brand: '品牌故事', review: '评价社区', global: '全球 & 服务', worldwide: '全球购物', contact: '联系我们' },
-  jp: { product: '商品', event: 'イベント & お知らせ', brand: 'ブランドストーリー', review: 'レビュー', global: 'グローバル & CS', worldwide: 'ショップ全世界', contact: 'お問い合わせ' },
-  vn: { product: 'Sản Phẩm', event: 'SỰ KIỆN & TIN TỨC', brand: 'CÂU CHUYỆN THƯƠNG HIỆU', review: 'ĐÁNH GIÁ', global: 'Toàn Cầu & CS', worldwide: 'MUA HÀNG TOÀN CẦU', contact: 'Liên Hệ' },
-  th: { product: 'สินค้า', event: 'อีเวนต์ & ข่าวสาร', brand: 'เรื่องราวแบรนด์', review: 'รีวิว', global: 'ทั่วโลก & CS', worldwide: 'ช้อปทั่วโลก', contact: 'ติดต่อเรา' },
+  kr: { product: 'Product', event: 'EVENT & NOTICE', brand: 'BRAND STORY', review: 'REVIEW & COMMUNITY', global: 'SHOP Worldwide', worldwide: 'SHOP Worldwide', contact: '고객센터' },
+  en: { product: 'Product', event: 'EVENT & NOTICE', brand: 'BRAND STORY', review: 'REVIEWS', global: 'SHOP Worldwide', worldwide: 'SHOP Worldwide', contact: 'Contact' },
+  cn: { product: '商品', event: '活动 & 通知', brand: '品牌故事', review: '评价社区', global: '全球购物', worldwide: '全球购物', contact: '联系我们' },
+  jp: { product: '商品', event: 'イベント & お知らせ', brand: 'ブランドストーリー', review: 'レビュー', global: 'ショップ全世界', worldwide: 'ショップ全世界', contact: 'お問い合わせ' },
+  vn: { product: 'Sản Phẩm', event: 'SỰ KIỆN & TIN TỨC', brand: 'CÂU CHUYỆN THƯƠNG HIỆU', review: 'ĐÁNH GIÁ', global: 'MUA HÀNG TOÀN CẦU', worldwide: 'MUA HÀNG TOÀN CẦU', contact: 'Liên Hệ' },
+  th: { product: 'สินค้า', event: 'อีเวนต์ & ข่าวสาร', brand: 'เรื่องราวแบรนด์', review: 'รีวิว', global: 'ช้อปทั่วโลก', worldwide: 'ช้อปทั่วโลก', contact: 'ติดต่อเรา' },
 };
 
 export default function Header({ canPurchase = true, region = 'kr' }: HeaderProps) {
@@ -207,45 +207,13 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
                 </Link>
               ))}
 
-              {/* Global & CS — dropdown */}
-              <div
-                className="relative h-full flex items-center"
-                onMouseEnter={() => openMenu('global')}
-                onMouseLeave={closeMenu}
+              {/* Shop Worldwide — direct link */}
+              <Link
+                href={`/${region}/${lang}/worldwide`}
+                className="px-4 h-full flex items-center text-[13.5px] font-semibold text-neutral-800 hover:text-black tracking-wide transition-colors"
               >
-                <button className={`flex items-center gap-1 px-4 h-full text-[13.5px] font-semibold tracking-wide transition-colors ${activeMenu === 'global' ? 'text-black' : 'text-neutral-800 hover:text-black'}`}>
-                  {nav.global}
-                </button>
-                {activeMenu === 'global' && (
-                  <span className="absolute bottom-0 left-4 right-4 h-[2.5px] bg-[#4a7a3e] rounded-full" />
-                )}
-
-                {activeMenu === 'global' && (
-                  <div
-                    className="absolute top-full left-0 bg-white border-t-2 border-black shadow-xl z-50 animate-in fade-in slide-in-from-top-2 duration-150 min-w-[200px]"
-                    onMouseEnter={keepMenu}
-                    onMouseLeave={closeMenu}
-                  >
-                    <ul className="py-2">
-                      {[
-                        { label: nav.worldwide, href: `/${region}/${lang}/worldwide`, icon: '🌍' },
-                        { label: nav.contact, href: `/${region}/${lang}/support`, icon: '💬' },
-                      ].map(item => (
-                        <li key={item.label}>
-                          <Link
-                            href={item.href}
-                            className="flex items-center gap-3 px-5 py-3 text-[13px] text-neutral-700 hover:bg-neutral-50 hover:text-black transition-colors"
-                            onClick={() => setActiveMenu(null)}
-                          >
-                            <span className="text-base">{item.icon}</span>
-                            {item.label}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
+                {nav.global}
+              </Link>
             </nav>
 
             {/* ── Right Icons ──────────────────────────────────────────── */}
