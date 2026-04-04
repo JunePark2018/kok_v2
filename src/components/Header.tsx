@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Search, ShoppingBag, User, Menu, X, Globe } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/context';
 import LanguagePicker from '@/components/LanguagePicker';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 
 interface HeaderProps {
   canPurchase?: boolean;
@@ -75,6 +75,7 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
   const [mobileOpen, setMobileOpen] = useState(false);
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const isAdmin = useMemo(() => typeof document !== 'undefined' && document.cookie.includes('kokkok_admin_auth=true'), []);
   const util = UTILITY[lang] ?? UTILITY['en'];
   const nav = NAV_LABELS[lang] ?? NAV_LABELS['en'];
   const productMega = PRODUCT_MEGA[lang] ?? PRODUCT_MEGA['en'];
@@ -97,6 +98,9 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
       {/* ── UTILITY BAR ─────────────────────────────────────────────── */}
       <div className="bg-white border-b border-neutral-100 hidden lg:block">
         <div className="max-w-[1600px] mx-auto px-8 flex justify-end items-center h-9 gap-5 text-[11px] text-neutral-500 font-medium tracking-wide">
+          {isAdmin && (
+            <Link href="/admin" className="hover:text-black transition-colors text-[#4a7a3e] font-bold">ADMIN</Link>
+          )}
           <Link href="/register" className="hover:text-black transition-colors">{util.join}</Link>
           <Link href="/login" className="hover:text-black transition-colors">{util.login}</Link>
           <Link href={`/${region}/${lang}/orders`} className="hover:text-black transition-colors">{util.order}</Link>
