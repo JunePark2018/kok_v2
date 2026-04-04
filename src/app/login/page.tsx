@@ -53,7 +53,14 @@ export default function LoginPage() {
           password: password.trim(),
         });
         if (!authError) {
-          document.cookie = "kokkok_admin_auth=true; path=/; max-age=86400; Secure; SameSite=Lax";
+          // Check if user is admin
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            const { data: profile } = await supabase.from('users').select('role').eq('id', user.id).single();
+            if (profile?.role === 'admin') {
+              document.cookie = "kokkok_admin_auth=true; path=/; max-age=86400; Secure; SameSite=Lax";
+            }
+          }
           window.location.href = '/kr/kr';
           return;
         }
