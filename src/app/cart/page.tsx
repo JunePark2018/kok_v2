@@ -39,7 +39,7 @@ function CartContent() {
           <p className="text-sm text-neutral-400 mt-1">총 {totalCount}개의 상품</p>
         </div>
         <button
-          onClick={clearCart}
+          onClick={() => { if (confirm('장바구니를 비우시겠습니까?')) clearCart(); }}
           className="text-[11px] text-neutral-400 hover:text-red-500 font-medium tracking-wide transition-colors"
         >
           전체 삭제
@@ -124,7 +124,7 @@ function CartContent() {
                   {/* Delete */}
                   <div className="hidden sm:flex justify-end">
                     <button
-                      onClick={() => removeItem(item.productId)}
+                      onClick={() => { if (confirm(`"${item.name}" 을(를) 장바구니에서 삭제하시겠습니까?`)) removeItem(item.productId); }}
                       className="w-8 h-8 flex items-center justify-center text-neutral-300 hover:text-red-500 transition-colors"
                     >
                       <X className="w-4 h-4" />
@@ -137,7 +137,7 @@ function CartContent() {
                       {(item.price * item.quantity).toLocaleString()}원
                     </span>
                     <button
-                      onClick={() => removeItem(item.productId)}
+                      onClick={() => { if (confirm(`"${item.name}" 을(를) 장바구니에서 삭제하시겠습니까?`)) removeItem(item.productId); }}
                       className="p-1 text-neutral-300 hover:text-red-500 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
