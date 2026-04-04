@@ -27,7 +27,7 @@ export default async function KrLangLayout({
 
   return (
     <I18nProvider region="kr" lang={lang}>
-      <div className="flex flex-col min-h-screen font-sans">
+      <div className="flex flex-col min-h-screen">
         <PromoBanner />
         <Header canPurchase={true} region="kr" />
         <main className="flex-1 w-full bg-white">{children}</main>

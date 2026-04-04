@@ -17,7 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className={`${notoSans.className} bg-white text-neutral-950 font-sans antialiased min-h-screen`}>
+      <body className={`${notoSans.className} bg-white text-neutral-950 antialiased min-h-screen`}>
         <StorefrontLayoutWrapper>
           {children}
         </StorefrontLayoutWrapper>
