@@ -1,7 +1,7 @@
 export type Lang = 'en' | 'cn' | 'jp' | 'vn' | 'th' | 'kr';
 export type Region = 'gl' | 'kr';
 
-export const SUPPORTED_LANGS: Lang[] = ['en', 'cn', 'jp', 'vn', 'th', 'kr'];
+export const SUPPORTED_LANGS: Lang[] = ['kr', 'en'];
 
 export const LANG_LABELS: Record<Lang, string> = {
   en: 'English',

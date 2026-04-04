@@ -9,9 +9,9 @@ import TiptapLink from '@tiptap/extension-link';
 import TiptapImage from '@tiptap/extension-image';
 
 /* ── Constants ─────────────────────────────────────────────────────── */
-const LANGS = ['kr', 'en', 'cn', 'jp', 'vn', 'th'] as const;
+const LANGS = ['kr', 'en'] as const;
 const LANG_LABELS: Record<string, string> = {
-  kr: '한국어', en: 'English', cn: '中文', jp: '日本語', vn: 'Tiếng Việt', th: 'ไทย',
+  kr: '한국어', en: 'English',
 };
 
 type LangMap = Record<string, string>;
