@@ -31,7 +31,7 @@ export default async function GlLangLayout({
     <I18nProvider region="gl" lang={lang}>
       <CartProvider>
         <div className="flex flex-col min-h-screen">
-          <PromoBanner />
+          {/* <PromoBanner /> */}
           <Header canPurchase={false} region="gl" />
           <main className="flex-1 w-full bg-white">{children}</main>
           <Footer />
