@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Users, Package, Video, LayoutDashboard, LogOut, FileText, ExternalLink } from 'lucide-react';
+import { Users, Package, Video, LayoutDashboard, LogOut, FileText, ExternalLink, Tag } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -10,6 +10,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const navItems = [
     { name: '대시보드', href: '/admin', icon: LayoutDashboard },
     { name: '사용자', href: '/admin/users', icon: Users },
+    { name: '카테고리', href: '/admin/categories', icon: Tag },
     { name: '상품 관리', href: '/admin/products', icon: Package },
     { name: '숏츠', href: '/admin/shorts', icon: Video },
     { name: '페이지 관리', href: '/admin/pages', icon: FileText },
@@ -18,6 +19,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pageTitle: Record<string, string> = {
     '/admin': '대시보드 개요',
     '/admin/users': '사용자 관리',
+    '/admin/categories': '카테고리 관리',
     '/admin/products': '상품 관리',
     '/admin/shorts': '숏츠 관리',
     '/admin/pages': '페이지 관리',

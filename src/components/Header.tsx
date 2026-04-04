@@ -6,6 +6,7 @@ import { useI18n } from '@/lib/i18n/context';
 import LanguagePicker from '@/components/LanguagePicker';
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { supabase } from '@/lib/api/products';
+import { getCategoriesTree, type CategoryWithChildren } from '@/lib/api/categories';
 
 interface HeaderProps {
   canPurchase?: boolean;
@@ -20,45 +21,6 @@ const UTILITY: Record<string, { join: string; login: string; logout: string; ord
   jp: { join: '会員登録', login: 'ログイン', logout: 'ログアウト', order: '注文照会', recent: '最近見た商品', cs: 'サポート' },
   vn: { join: 'Đăng ký', login: 'Đăng nhập', logout: 'Đăng xuất', order: 'Đơn hàng', recent: 'Đã xem', cs: 'Hỗ trợ' },
   th: { join: 'สมัครสมาชิก', login: 'เข้าสู่ระบบ', logout: 'ออกจากระบบ', order: 'ติดตามออเดอร์', recent: 'ดูล่าสุด', cs: 'ช่วยเหลือ' },
-};
-
-const PRODUCT_MEGA: Record<string, { label: string; items: { name: string; slug: string }[] }[]> = {
-  kr: [
-    { label: '유형별', items: [{ name: '세럼/앰플', slug: 'serum' }, { name: '크림/로션', slug: 'cream' }, { name: '클렌징', slug: 'cleansing' }, { name: '선케어', slug: 'suncare' }, { name: '마스크', slug: 'mask' }] },
-    { label: '성분별', items: [{ name: 'PDRN', slug: 'pdrn' }, { name: 'EGF/펩타이드', slug: 'egf' }, { name: 'CICA', slug: 'cica' }, { name: '레티놀', slug: 'retinol' }, { name: '어성초', slug: 'heartleaf' }] },
-    { label: '피부고민', items: [{ name: '수분/보습', slug: 'moisture' }, { name: '진정/트러블', slug: 'soothing' }, { name: '미백/광채', slug: 'brightening' }, { name: '탄력/안티에이징', slug: 'antiaging' }, { name: '모공/피지', slug: 'pore' }] },
-    { label: '기획전', items: [{ name: '신상품', slug: 'new' }, { name: '베스트셀러', slug: 'best' }, { name: '세일', slug: 'sale' }, { name: '세트/기프트', slug: 'set' }] },
-  ],
-  en: [
-    { label: 'By Type', items: [{ name: 'Serum / Ampoule', slug: 'serum' }, { name: 'Cream / Lotion', slug: 'cream' }, { name: 'Cleansing', slug: 'cleansing' }, { name: 'Sun Care', slug: 'suncare' }, { name: 'Mask', slug: 'mask' }] },
-    { label: 'By Ingredient', items: [{ name: 'PDRN', slug: 'pdrn' }, { name: 'EGF / Peptide', slug: 'egf' }, { name: 'CICA', slug: 'cica' }, { name: 'Retinol', slug: 'retinol' }, { name: 'Heartleaf', slug: 'heartleaf' }] },
-    { label: 'By Concern', items: [{ name: 'Hydration', slug: 'moisture' }, { name: 'Soothing', slug: 'soothing' }, { name: 'Brightening', slug: 'brightening' }, { name: 'Anti-Aging', slug: 'antiaging' }, { name: 'Pore Care', slug: 'pore' }] },
-    { label: 'Collections', items: [{ name: 'New Arrivals', slug: 'new' }, { name: 'Best Sellers', slug: 'best' }, { name: 'Sale', slug: 'sale' }, { name: 'Gifts & Sets', slug: 'set' }] },
-  ],
-  cn: [
-    { label: '按类型', items: [{ name: '精华/安瓶', slug: 'serum' }, { name: '面霜/乳液', slug: 'cream' }, { name: '洁肤', slug: 'cleansing' }, { name: '防晒', slug: 'suncare' }, { name: '面膜', slug: 'mask' }] },
-    { label: '按成分', items: [{ name: 'PDRN', slug: 'pdrn' }, { name: 'EGF/肽', slug: 'egf' }, { name: 'CICA', slug: 'cica' }, { name: '视黄醇', slug: 'retinol' }, { name: '鱼腥草', slug: 'heartleaf' }] },
-    { label: '按肌肤需求', items: [{ name: '保湿补水', slug: 'moisture' }, { name: '舒缓镇定', slug: 'soothing' }, { name: '美白亮肤', slug: 'brightening' }, { name: '抗衰老', slug: 'antiaging' }, { name: '毛孔护理', slug: 'pore' }] },
-    { label: '精选系列', items: [{ name: '新品', slug: 'new' }, { name: '畅销榜', slug: 'best' }, { name: '特惠', slug: 'sale' }, { name: '礼盒套装', slug: 'set' }] },
-  ],
-  jp: [
-    { label: 'タイプ別', items: [{ name: 'セラム/アンプル', slug: 'serum' }, { name: 'クリーム/ローション', slug: 'cream' }, { name: 'クレンジング', slug: 'cleansing' }, { name: 'サンケア', slug: 'suncare' }, { name: 'マスク', slug: 'mask' }] },
-    { label: '成分別', items: [{ name: 'PDRN', slug: 'pdrn' }, { name: 'EGF/ペプチド', slug: 'egf' }, { name: 'CICA', slug: 'cica' }, { name: 'レチノール', slug: 'retinol' }, { name: 'ドクダミ', slug: 'heartleaf' }] },
-    { label: '悩み別', items: [{ name: '保湿', slug: 'moisture' }, { name: '鎮静', slug: 'soothing' }, { name: '美白/ツヤ', slug: 'brightening' }, { name: '抗老化', slug: 'antiaging' }, { name: '毛穴', slug: 'pore' }] },
-    { label: 'コレクション', items: [{ name: '新着', slug: 'new' }, { name: 'ベストセラー', slug: 'best' }, { name: 'セール', slug: 'sale' }, { name: 'ギフトセット', slug: 'set' }] },
-  ],
-  vn: [
-    { label: 'Theo Loại', items: [{ name: 'Serum/Ampoule', slug: 'serum' }, { name: 'Kem/Lotion', slug: 'cream' }, { name: 'Tẩy Trang', slug: 'cleansing' }, { name: 'Chống Nắng', slug: 'suncare' }, { name: 'Mặt Nạ', slug: 'mask' }] },
-    { label: 'Theo Thành Phần', items: [{ name: 'PDRN', slug: 'pdrn' }, { name: 'EGF/Peptide', slug: 'egf' }, { name: 'CICA', slug: 'cica' }, { name: 'Retinol', slug: 'retinol' }, { name: 'Diếp Cá', slug: 'heartleaf' }] },
-    { label: 'Theo Vấn Đề Da', items: [{ name: 'Dưỡng Ẩm', slug: 'moisture' }, { name: 'Làm Dịu Da', slug: 'soothing' }, { name: 'Làm Sáng Da', slug: 'brightening' }, { name: 'Chống Lão Hoá', slug: 'antiaging' }, { name: 'Se Lỗ Chân Lông', slug: 'pore' }] },
-    { label: 'Bộ Sưu Tập', items: [{ name: 'Hàng Mới', slug: 'new' }, { name: 'Bán Chạy', slug: 'best' }, { name: 'Khuyến Mãi', slug: 'sale' }, { name: 'Bộ Quà Tặng', slug: 'set' }] },
-  ],
-  th: [
-    { label: 'ตามประเภท', items: [{ name: 'เซรั่ม/แอมพูล', slug: 'serum' }, { name: 'ครีม/โลชั่น', slug: 'cream' }, { name: 'คลีนซิ่ง', slug: 'cleansing' }, { name: 'ครีมกันแดด', slug: 'suncare' }, { name: 'มาสก์', slug: 'mask' }] },
-    { label: 'ตามส่วนผสม', items: [{ name: 'PDRN', slug: 'pdrn' }, { name: 'EGF/เปปไทด์', slug: 'egf' }, { name: 'CICA', slug: 'cica' }, { name: 'เรตินอล', slug: 'retinol' }, { name: 'พลูคาว', slug: 'heartleaf' }] },
-    { label: 'ตามปัญหาผิว', items: [{ name: 'มอยส์เจอไรซิ่ง', slug: 'moisture' }, { name: 'บรรเทาผิว', slug: 'soothing' }, { name: 'ผิวกระจ่างใส', slug: 'brightening' }, { name: 'ต้านริ้วรอย', slug: 'antiaging' }, { name: 'รูขุมขน', slug: 'pore' }] },
-    { label: 'คอลเลคชัน', items: [{ name: 'สินค้าใหม่', slug: 'new' }, { name: 'ขายดี', slug: 'best' }, { name: 'ลดราคา', slug: 'sale' }, { name: 'เซ็ตของขวัญ', slug: 'set' }] },
-  ],
 };
 
 const NAV_LABELS: Record<string, { product: string; event: string; brand: string; review: string; global: string; worldwide: string; contact: string }> = {
@@ -78,6 +40,7 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [navPages, setNavPages] = useState<{ slug: string; title: Record<string, string> }[]>([]);
+  const [megaCategories, setMegaCategories] = useState<CategoryWithChildren[]>([]);
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isLoggedIn = useMemo(() => typeof document !== 'undefined' && document.cookie.includes('kokkok_auth=true'), []);
@@ -96,10 +59,25 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
     } catch { /* ignore */ }
   }, []);
 
-  useEffect(() => { fetchNavPages(); }, [fetchNavPages]);
+  const fetchCategories = useCallback(async () => {
+    try {
+      const tree = await getCategoriesTree();
+      setMegaCategories(tree);
+    } catch { /* ignore */ }
+  }, []);
+
+  useEffect(() => { fetchNavPages(); fetchCategories(); }, [fetchNavPages, fetchCategories]);
   const util = UTILITY[lang] ?? UTILITY['en'];
   const nav = NAV_LABELS[lang] ?? NAV_LABELS['en'];
-  const productMega = PRODUCT_MEGA[lang] ?? PRODUCT_MEGA['en'];
+
+  const productMega = megaCategories.map(cat => ({
+    label: cat.name[lang] || cat.name['en'] || cat.slug,
+    slug: cat.slug,
+    items: cat.children.map(sub => ({
+      name: sub.name[lang] || sub.name['en'] || sub.slug,
+      slug: sub.slug,
+    })),
+  }));
 
   const openMenu = (name: string) => {
     if (hoverTimer.current) clearTimeout(hoverTimer.current);
@@ -240,23 +218,39 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
           </div>
         </div>
 
-          {/* ── Product Submenu Bar (slim, reference style) ─────────────── */}
-        {activeMenu === 'product' && (
+          {/* ── Product Mega Menu ─────────────────────────────────────── */}
+        {activeMenu === 'product' && productMega.length > 0 && (
           <div
-            className="absolute top-full left-0 w-full bg-white border-t border-neutral-100 shadow-sm z-30"
+            className="absolute top-full left-0 w-full bg-white border-t border-neutral-100 shadow-lg z-30"
             onMouseEnter={keepMenu}
             onMouseLeave={closeMenu}
           >
-            <div className="max-w-[1600px] mx-auto px-8 flex items-center h-11 gap-8">
-              {productMega.slice(0, 3).map(col => (
-                <Link
-                  key={col.label}
-                  href={`/${region}/${lang}/products?category=${col.items[0]?.slug ?? ''}`}
-                  className="text-[13px] text-neutral-600 hover:text-black font-medium tracking-wide transition-colors"
-                  onClick={() => setActiveMenu(null)}
-                >
-                  {col.label}
-                </Link>
+            <div className="max-w-[1600px] mx-auto px-8 py-6 flex gap-12">
+              {productMega.map(col => (
+                <div key={col.slug}>
+                  <Link
+                    href={`/${region}/${lang}/products?category=${col.slug}`}
+                    className="text-[13px] font-bold text-neutral-900 hover:text-[#4a7a3e] tracking-wide transition-colors"
+                    onClick={() => setActiveMenu(null)}
+                  >
+                    {col.label}
+                  </Link>
+                  {col.items.length > 0 && (
+                    <ul className="mt-2.5 space-y-1.5">
+                      {col.items.map(item => (
+                        <li key={item.slug}>
+                          <Link
+                            href={`/${region}/${lang}/products?sub=${item.slug}`}
+                            className="text-[12.5px] text-neutral-500 hover:text-black transition-colors"
+                            onClick={() => setActiveMenu(null)}
+                          >
+                            {item.name}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               ))}
             </div>
           </div>

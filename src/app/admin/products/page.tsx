@@ -1,8 +1,9 @@
 'use client';
 
 import { Plus, Trash2, Upload, X, ImageIcon, Pencil } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Product, supabase, MOCK_PRODUCTS } from '@/lib/api/products';
+import type { Category } from '@/lib/api/categories';
 
 const BUCKET = 'product-images';
 
@@ -16,6 +17,7 @@ export default function ProductsAdminPage() {
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [categories, setCategories] = useState<Category[]>([]);
   const [formData, setFormData] = useState({
     name: '',
     summary: '',
@@ -25,12 +27,21 @@ export default function ProductsAdminPage() {
     imageUrl: '',       // final URL after upload or manual entry
     imageFile: null as File | null,
     description: '',
-    naverStoreUrl: ''
+    naverStoreUrl: '',
+    categoryId: '',
+    subcategoryId: '',
   });
+
+  const fetchCategories = useCallback(async () => {
+    if (!supabase) return;
+    const { data } = await supabase.from('categories').select('*').eq('is_active', true).order('sort_order');
+    if (data) setCategories(data);
+  }, []);
 
   useEffect(() => {
     fetchAll();
-  }, []);
+    fetchCategories();
+  }, [fetchCategories]);
 
   async function fetchAll() {
     setIsLoading(true);
@@ -51,7 +62,9 @@ export default function ProductsAdminPage() {
         originalPrice: Number(d.original_price || d.price),
         imageUrl: (d.images && d.images.length > 0) ? d.images[0] : '',
         is_active: d.is_active,
-        naver_store_url: d.naver_store_url || ''
+        naver_store_url: d.naver_store_url || '',
+        category_id: d.category_id || undefined,
+        subcategory_id: d.subcategory_id || undefined,
       })));
     } catch {
       console.warn('DB 연결 실패. 목업 데이터로 전환.');
@@ -120,7 +133,7 @@ export default function ProductsAdminPage() {
   const resetModal = () => {
     setIsModalOpen(false);
     setEditingId(null);
-    setFormData({ name: '', summary: '', ingredient: '', price: '', originalPrice: '', imageUrl: '', imageFile: null, description: '', naverStoreUrl: '' });
+    setFormData({ name: '', summary: '', ingredient: '', price: '', originalPrice: '', imageUrl: '', imageFile: null, description: '', naverStoreUrl: '', categoryId: '', subcategoryId: '' });
     setPreviewUrl('');
     setUploadProgress('idle');
     setIsSubmitting(false);
@@ -137,7 +150,9 @@ export default function ProductsAdminPage() {
       imageUrl: item.imageUrl,
       imageFile: null,
       description: item.description,
-      naverStoreUrl: item.naver_store_url || ''
+      naverStoreUrl: item.naver_store_url || '',
+      categoryId: item.category_id || '',
+      subcategoryId: item.subcategory_id || '',
     });
     setPreviewUrl(item.imageUrl);
     setIsModalOpen(true);
@@ -181,7 +196,9 @@ export default function ProductsAdminPage() {
         original_price: Number(formData.originalPrice || formData.price),
         description: formData.description,
         images: finalImageUrl ? [finalImageUrl] : [],
-        naver_store_url: formData.naverStoreUrl || null
+        naver_store_url: formData.naverStoreUrl || null,
+        category_id: formData.categoryId || null,
+        subcategory_id: formData.subcategoryId || null,
       };
 
       if (editingId) {
@@ -417,6 +434,37 @@ export default function ProductsAdminPage() {
                     className="w-full border border-gray-200 p-2 text-sm rounded bg-gray-50 focus:bg-white focus:border-black transition outline-none"
                     placeholder="예: CICA"
                   />
+                </div>
+              </div>
+
+              {/* Category + Subcategory */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold tracking-widest text-gray-500 uppercase">카테고리</label>
+                  <select
+                    value={formData.categoryId}
+                    onChange={e => setFormData(prev => ({ ...prev, categoryId: e.target.value, subcategoryId: '' }))}
+                    className="w-full border border-gray-200 p-2 text-sm rounded bg-gray-50 focus:bg-white focus:border-black transition outline-none"
+                  >
+                    <option value="">선택 안 함</option>
+                    {categories.filter(c => !c.parent_id).map(c => (
+                      <option key={c.id} value={c.id}>{c.name?.kr || c.slug}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[11px] font-bold tracking-widest text-gray-500 uppercase">서브카테고리</label>
+                  <select
+                    value={formData.subcategoryId}
+                    onChange={e => setFormData(prev => ({ ...prev, subcategoryId: e.target.value }))}
+                    disabled={!formData.categoryId}
+                    className="w-full border border-gray-200 p-2 text-sm rounded bg-gray-50 focus:bg-white focus:border-black transition outline-none disabled:opacity-40"
+                  >
+                    <option value="">선택 안 함</option>
+                    {categories.filter(c => c.parent_id === formData.categoryId).map(c => (
+                      <option key={c.id} value={c.id}>{c.name?.kr || c.slug}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
