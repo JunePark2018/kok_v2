@@ -32,7 +32,7 @@ export default function AdminLogin() {
         if (!authError) {
           // Success from DB!
           document.cookie = "kokkok_admin_auth=true; path=/; max-age=86400; Secure; SameSite=Lax";
-          window.location.href = '/admin';
+          window.location.href = '/kr/kr';
           return;
         }
       }
@@ -40,7 +40,7 @@ export default function AdminLogin() {
       // 2. Fallback / Mock Override for development
       if (id.trim() === 'admin123' && password.trim() === '456789123') {
         document.cookie = "kokkok_admin_auth=true; path=/; max-age=86400; Secure; SameSite=Lax";
-        window.location.href = '/admin';
+        window.location.href = '/kr/kr';
       } else {
         setError('Invalid Email or Password.');
       }
@@ -49,7 +49,7 @@ export default function AdminLogin() {
       console.warn("DB login failed, trying fallback mock.", err);
       if (id.trim() === 'admin123' && password.trim() === '456789123') {
         document.cookie = "kokkok_admin_auth=true; path=/; max-age=86400; Secure; SameSite=Lax";
-        window.location.href = '/admin';
+        window.location.href = '/kr/kr';
       } else {
         setError('Invalid Email or Password.');
       }
