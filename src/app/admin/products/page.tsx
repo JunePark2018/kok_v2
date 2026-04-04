@@ -1,6 +1,6 @@
 'use client';
 
-import { Plus, Trash2, Upload, X, ImageIcon } from 'lucide-react';
+import { Plus, Trash2, Upload, X, ImageIcon, Pencil } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { Product, supabase, MOCK_PRODUCTS } from '@/lib/api/products';
 
@@ -10,6 +10,7 @@ export default function ProductsAdminPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<'idle' | 'uploading' | 'done' | 'error'>('idle');
   const [previewUrl, setPreviewUrl] = useState<string>('');
@@ -118,10 +119,28 @@ export default function ProductsAdminPage() {
 
   const resetModal = () => {
     setIsModalOpen(false);
+    setEditingId(null);
     setFormData({ name: '', summary: '', ingredient: '', price: '', originalPrice: '', imageUrl: '', imageFile: null, description: '', naverStoreUrl: '' });
     setPreviewUrl('');
     setUploadProgress('idle');
     setIsSubmitting(false);
+  };
+
+  const openEdit = (item: Product) => {
+    setEditingId(item.id);
+    setFormData({
+      name: item.name,
+      summary: item.summary,
+      ingredient: item.ingredient,
+      price: String(item.price),
+      originalPrice: String(item.originalPrice),
+      imageUrl: item.imageUrl,
+      imageFile: null,
+      description: item.description,
+      naverStoreUrl: item.naver_store_url || ''
+    });
+    setPreviewUrl(item.imageUrl);
+    setIsModalOpen(true);
   };
 
   const handleAddSubmit = async (e: React.FormEvent) => {
@@ -154,24 +173,33 @@ export default function ProductsAdminPage() {
         naver_store_url: formData.naverStoreUrl || undefined
       };
 
-      // Optimistic UI update
-      setProducts(prev => [newProduct, ...prev]);
+      const dbPayload = {
+        name: formData.name,
+        summary: formData.summary,
+        ingredient: formData.ingredient,
+        price: Number(formData.price),
+        original_price: Number(formData.originalPrice || formData.price),
+        description: formData.description,
+        images: finalImageUrl ? [finalImageUrl] : [],
+        naver_store_url: formData.naverStoreUrl || null
+      };
 
-      if (supabase) {
-        const { error } = await supabase.from('products').insert([{
-          name: formData.name,
-          summary: formData.summary,
-          ingredient: formData.ingredient,
-          price: Number(formData.price),
-          original_price: Number(formData.originalPrice || formData.price),
-          description: formData.description,
-          images: finalImageUrl ? [finalImageUrl] : [],
-          is_active: true,
-          naver_store_url: formData.naverStoreUrl || null
-        }]);
-        if (error) throw error;
-        // Refresh from DB to get proper ID
-        await fetchAll();
+      if (editingId) {
+        // UPDATE existing product
+        setProducts(prev => prev.map(p => p.id === editingId ? { ...p, ...newProduct } : p));
+        if (supabase) {
+          const { error } = await supabase.from('products').update(dbPayload).eq('id', editingId);
+          if (error) throw error;
+          await fetchAll();
+        }
+      } else {
+        // INSERT new product
+        setProducts(prev => [newProduct, ...prev]);
+        if (supabase) {
+          const { error } = await supabase.from('products').insert([{ ...dbPayload, is_active: true }]);
+          if (error) throw error;
+          await fetchAll();
+        }
       }
 
       resetModal();
@@ -259,7 +287,10 @@ export default function ProductsAdminPage() {
                       {item.is_active ? '게시중' : '숨김'}
                     </button>
                   </td>
-                  <td className="p-4 pr-6 text-right">
+                  <td className="p-4 pr-6 text-right flex gap-1.5 justify-end">
+                    <button onClick={() => openEdit(item)} className="text-gray-400 hover:text-blue-600 transition-colors bg-white p-1.5 rounded-md shadow-sm border border-gray-100">
+                      <Pencil className="w-4 h-4 inline" />
+                    </button>
                     <button onClick={() => handleDelete(item.id)} className="text-gray-400 hover:text-red-600 transition-colors bg-white p-1.5 rounded-md shadow-sm border border-gray-100">
                       <Trash2 className="w-4 h-4 inline" />
                     </button>
@@ -276,7 +307,7 @@ export default function ProductsAdminPage() {
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[92vh]">
             <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-              <h3 className="font-bold text-lg">새 상품 추가</h3>
+              <h3 className="font-bold text-lg">{editingId ? '상품 수정' : '새 상품 추가'}</h3>
               <button onClick={resetModal} className="text-gray-400 hover:text-black transition-colors p-1 rounded hover:bg-gray-100">
                 <X className="w-5 h-5" />
               </button>
@@ -472,7 +503,7 @@ export default function ProductsAdminPage() {
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       저장 중...
                     </>
-                  ) : '상품 저장'}
+                  ) : editingId ? '수정 저장' : '상품 저장'}
                 </button>
               </div>
             </form>
