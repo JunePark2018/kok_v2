@@ -1,13 +1,16 @@
 'use client';
 import { useState } from 'react';
+import { useI18n } from '@/lib/i18n/context';
 
 interface ProductActionButtonsProps {
   productId: string;
   price: number;
+  naverStoreUrl?: string;
 }
 
-export default function ProductActionButtons({ productId, price }: ProductActionButtonsProps) {
+export default function ProductActionButtons({ productId, price, naverStoreUrl }: ProductActionButtonsProps) {
   const [quantity, setQuantity] = useState(1);
+  const { t } = useI18n();
 
   const increase = () => setQuantity(prev => prev + 1);
   const decrease = () => setQuantity(prev => (prev > 1 ? prev - 1 : 1));
@@ -17,7 +20,11 @@ export default function ProductActionButtons({ productId, price }: ProductAction
   };
 
   const handleBuyNow = () => {
-    alert(`[결제] 결제 페이지로 이동합니다.\n\n총 결제금액: ${(price * quantity).toLocaleString()}원\n\n* 실제 결제 모듈 연동은 Phase 2에서 진행됩니다.`);
+    if (naverStoreUrl) {
+      window.open(naverStoreUrl, '_blank', 'noopener,noreferrer');
+    } else {
+      alert(`[결제] 결제 페이지로 이동합니다.\n\n총 결제금액: ${(price * quantity).toLocaleString()}원\n\n* 실제 결제 모듈 연동은 Phase 2에서 진행됩니다.`);
+    }
   };
 
   return (
@@ -40,17 +47,20 @@ export default function ProductActionButtons({ productId, price }: ProductAction
 
       {/* Action Buttons */}
       <div className="flex gap-2">
-        <button 
+        <button
           onClick={handleAddToCart}
           className="flex-1 bg-white border border-[#111111] text-[#111111] py-4.5 font-bold tracking-widest text-[13px] hover:bg-neutral-50 transition-colors"
         >
-          장바구니 구경
+          {t('product.addToCart')}
         </button>
-        <button 
+        <button
           onClick={handleBuyNow}
           className="flex-1 bg-[#111111] text-white py-4.5 font-bold tracking-widest text-[13px] hover:bg-black transition-colors shadow-lg shadow-black/10"
         >
-          구매하기
+          {t('product.buyNow')}
+          {naverStoreUrl && (
+            <span className="ml-1 text-[10px] opacity-70">↗</span>
+          )}
         </button>
       </div>
     </div>

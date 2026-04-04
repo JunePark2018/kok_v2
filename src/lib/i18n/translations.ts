@@ -41,7 +41,9 @@ export type TranslationKey =
   | 'chatbot.title'
   | 'chatbot.placeholder'
   | 'chatbot.send'
-  | 'chatbot.greeting';
+  | 'chatbot.greeting'
+  | 'promo.message'
+  | 'promo.hideToday';
 
 type Translations = Record<TranslationKey, string>;
 
@@ -88,6 +90,8 @@ export const translations: Record<Lang, Translations> = {
     'chatbot.placeholder': '무엇이든 물어보세요...',
     'chatbot.send': '전송',
     'chatbot.greeting': '안녕하세요! 콕콕가든 AI 어시스턴트입니다. 무엇을 도와드릴까요?',
+    'promo.message': '지금 가입하고 첫구매 혜택 받아가세요!',
+    'promo.hideToday': '오늘 하루 보지 않기',
   },
   en: {
     'nav.type': 'By Type',
@@ -131,6 +135,8 @@ export const translations: Record<Lang, Translations> = {
     'chatbot.placeholder': 'Ask anything...',
     'chatbot.send': 'Send',
     'chatbot.greeting': 'Hello! I\'m the Kokkok Garden AI Assistant. How can I help you today?',
+    'promo.message': 'Sign up now and get your first purchase benefit!',
+    'promo.hideToday': 'Don\'t show today',
   },
   cn: {
     'nav.type': '按类型',
@@ -174,6 +180,8 @@ export const translations: Record<Lang, Translations> = {
     'chatbot.placeholder': '请输入您的问题...',
     'chatbot.send': '发送',
     'chatbot.greeting': '您好！我是Kokkok Garden AI助手，有什么可以帮助您的吗？',
+    'promo.message': '立即注册，享受首次购买优惠！',
+    'promo.hideToday': '今天不再显示',
   },
   jp: {
     'nav.type': 'タイプ別',
@@ -217,6 +225,8 @@ export const translations: Record<Lang, Translations> = {
     'chatbot.placeholder': '何でもお聞きください...',
     'chatbot.send': '送信',
     'chatbot.greeting': 'こんにちは！コッコクガーデンAIアシスタントです。何かお手伝いできますか？',
+    'promo.message': '今すぐ会員登録して初回購入特典をゲット！',
+    'promo.hideToday': '今日は表示しない',
   },
   vn: {
     'nav.type': 'Theo Loại',
@@ -260,6 +270,8 @@ export const translations: Record<Lang, Translations> = {
     'chatbot.placeholder': 'Hỏi bất cứ điều gì...',
     'chatbot.send': 'Gửi',
     'chatbot.greeting': 'Xin chào! Tôi là trợ lý AI của Kokkok Garden. Tôi có thể giúp gì cho bạn?',
+    'promo.message': 'Đăng ký ngay và nhận ưu đãi mua hàng lần đầu!',
+    'promo.hideToday': 'Không hiển thị hôm nay',
   },
   th: {
     'nav.type': 'ตามประเภท',
@@ -303,6 +315,8 @@ export const translations: Record<Lang, Translations> = {
     'chatbot.placeholder': 'ถามอะไรก็ได้...',
     'chatbot.send': 'ส่ง',
     'chatbot.greeting': 'สวัสดี! ฉันคือ AI ผู้ช่วยของ Kokkok Garden จะช่วยอะไรได้บ้าง?',
+    'promo.message': 'สมัครสมาชิกตอนนี้รับสิทธิพิเศษการซื้อครั้งแรก!',
+    'promo.hideToday': 'ไม่แสดงวันนี้',
   },
 };
 

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Search, ShoppingBag, User, Menu, X, ChevronDown, Globe } from 'lucide-react';
+import { Search, ShoppingBag, User, Menu, X, Globe } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/context';
 import LanguagePicker from '@/components/LanguagePicker';
 import { useState, useRef, useEffect } from 'react';
@@ -130,49 +130,18 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
             {/* ── Desktop Nav ─────────────────────────────────────────── */}
             <nav className="hidden lg:flex items-center flex-1 h-full">
 
-              {/* Product — mega menu */}
+              {/* Product — slim submenu bar (reference style) */}
               <div
                 className="relative h-full flex items-center"
                 onMouseEnter={() => openMenu('product')}
                 onMouseLeave={closeMenu}
               >
-                <button className={`flex items-center gap-1 px-4 h-full text-[13.5px] font-semibold tracking-wide transition-colors ${activeMenu === 'product' ? 'text-black border-b-2 border-black' : 'text-neutral-800 hover:text-black'}`}>
-                  {nav.product} <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeMenu === 'product' ? 'rotate-180' : ''}`} />
+                <button className={`flex items-center gap-1 px-4 h-full text-[13.5px] font-semibold tracking-wide transition-colors ${activeMenu === 'product' ? 'text-black' : 'text-neutral-800 hover:text-black'}`}>
+                  {nav.product}
                 </button>
-
+                {/* Green underline indicator */}
                 {activeMenu === 'product' && (
-                  <div
-                    className="absolute top-full left-0 bg-white border-t-2 border-black shadow-xl z-50 animate-in fade-in slide-in-from-top-2 duration-150"
-                    style={{ width: '580px' }}
-                    onMouseEnter={keepMenu}
-                    onMouseLeave={closeMenu}
-                  >
-                    <div className="grid grid-cols-4 gap-0 p-6">
-                      {productMega.map(col => (
-                        <div key={col.label} className="pr-4">
-                          <p className="text-[10px] font-bold tracking-widest text-neutral-400 uppercase mb-3">{col.label}</p>
-                          <ul className="space-y-2">
-                            {col.items.map(item => (
-                              <li key={item.slug}>
-                                <Link
-                                  href={`/${region}/${lang}/products?category=${item.slug}`}
-                                  className="text-[13px] text-neutral-700 hover:text-black hover:font-semibold transition-all block"
-                                  onClick={() => setActiveMenu(null)}
-                                >
-                                  {item.name}
-                                </Link>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="border-t border-neutral-100 px-6 py-3 bg-neutral-50 flex gap-4">
-                      <Link href={`/${region}/${lang}/products`} className="text-[11px] font-bold tracking-widest text-neutral-500 hover:text-black transition-colors uppercase" onClick={() => setActiveMenu(null)}>
-                        → View All Products
-                      </Link>
-                    </div>
-                  </div>
+                  <span className="absolute bottom-0 left-4 right-4 h-[2.5px] bg-[#4a7a3e] rounded-full" />
                 )}
               </div>
 
@@ -197,9 +166,12 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
                 onMouseEnter={() => openMenu('global')}
                 onMouseLeave={closeMenu}
               >
-                <button className={`flex items-center gap-1 px-4 h-full text-[13.5px] font-semibold tracking-wide transition-colors ${activeMenu === 'global' ? 'text-black border-b-2 border-black' : 'text-neutral-800 hover:text-black'}`}>
-                  {nav.global} <ChevronDown className={`w-3.5 h-3.5 transition-transform ${activeMenu === 'global' ? 'rotate-180' : ''}`} />
+                <button className={`flex items-center gap-1 px-4 h-full text-[13.5px] font-semibold tracking-wide transition-colors ${activeMenu === 'global' ? 'text-black' : 'text-neutral-800 hover:text-black'}`}>
+                  {nav.global}
                 </button>
+                {activeMenu === 'global' && (
+                  <span className="absolute bottom-0 left-4 right-4 h-[2.5px] bg-[#4a7a3e] rounded-full" />
+                )}
 
                 {activeMenu === 'global' && (
                   <div
@@ -253,7 +225,29 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
           </div>
         </div>
 
-        {/* ── Mobile Menu Drawer ───────────────────────────────────────── */}
+          {/* ── Product Submenu Bar (slim, reference style) ─────────────── */}
+        {activeMenu === 'product' && (
+          <div
+            className="absolute top-full left-0 w-full bg-white border-t border-neutral-100 shadow-sm z-30"
+            onMouseEnter={keepMenu}
+            onMouseLeave={closeMenu}
+          >
+            <div className="max-w-[1600px] mx-auto px-8 flex items-center h-11 gap-8">
+              {productMega.slice(0, 3).map(col => (
+                <Link
+                  key={col.label}
+                  href={`/${region}/${lang}/products?category=${col.items[0]?.slug ?? ''}`}
+                  className="text-[13px] text-neutral-600 hover:text-black font-medium tracking-wide transition-colors"
+                  onClick={() => setActiveMenu(null)}
+                >
+                  {col.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+      {/* ── Mobile Menu Drawer ───────────────────────────────────────── */}
         {mobileOpen && (
           <div className="lg:hidden bg-white border-t border-neutral-100 px-6 py-4 space-y-4 animate-in slide-in-from-top-2 duration-200">
             <Link href={`/${region}/${lang}/products`} className="block text-sm font-bold text-neutral-800 py-2 border-b border-neutral-100" onClick={() => setMobileOpen(false)}>{nav.product}</Link>
