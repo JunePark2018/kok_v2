@@ -1,20 +1,43 @@
 'use client';
 import { UserPlus } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize Supabase Client defensively
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
-export default function RegisterAccount() {
+const L: Record<string, { title: string; subtitle: string; email: string; password: string; register: string; creating: string; login: string; minChars: string; failMsg: string; successTitle: string; successMsg: string; backToLogin: string }> = {
+  kr: { title: '회원가입', subtitle: '콕콕가든 계정을 만드세요.', email: '이메일 주소', password: '비밀번호 (6자 이상)', register: '회원가입', creating: '생성 중...', login: '로그인으로 돌아가기', minChars: '비밀번호는 6자 이상이어야 합니다.', failMsg: '회원가입에 실패했습니다. 다시 시도해주세요.', successTitle: '가입 완료', successMsg: '계정이 생성되었습니다. 이제 로그인할 수 있습니다.', backToLogin: '로그인하기' },
+  en: { title: 'Create Account', subtitle: 'Register for Kokkok Garden.', email: 'Email Address', password: 'Password (min 6 chars)', register: 'REGISTER', creating: 'CREATING...', login: 'Back to login', minChars: 'Password must be at least 6 characters.', failMsg: 'Registration failed. Please try again.', successTitle: 'Account Created', successMsg: 'Your account has been created. You can now log in.', backToLogin: 'GO TO LOGIN' },
+  cn: { title: '注册账号', subtitle: '注册Kokkok Garden账号', email: '电子邮箱', password: '密码 (至少6位)', register: '注册', creating: '创建中...', login: '返回登录', minChars: '密码至少需要6个字符。', failMsg: '注册失败，请重试。', successTitle: '注册成功', successMsg: '账号已创建，现在可以登录了。', backToLogin: '去登录' },
+  jp: { title: 'アカウント作成', subtitle: 'コッコクガーデンに登録', email: 'メールアドレス', password: 'パスワード (6文字以上)', register: '登録', creating: '作成中...', login: 'ログインに戻る', minChars: 'パスワードは6文字以上必要です。', failMsg: '登録に失敗しました。再度お試しください。', successTitle: '登録完了', successMsg: 'アカウントが作成されました。ログインできます。', backToLogin: 'ログインへ' },
+  vn: { title: 'Tạo tài khoản', subtitle: 'Đăng ký tài khoản Kokkok Garden.', email: 'Địa chỉ email', password: 'Mật khẩu (tối thiểu 6 ký tự)', register: 'ĐĂNG KÝ', creating: 'ĐANG TẠO...', login: 'Quay lại đăng nhập', minChars: 'Mật khẩu phải có ít nhất 6 ký tự.', failMsg: 'Đăng ký thất bại. Vui lòng thử lại.', successTitle: 'Tạo tài khoản thành công', successMsg: 'Tài khoản đã được tạo. Bạn có thể đăng nhập ngay.', backToLogin: 'ĐI ĐẾN ĐĂNG NHẬP' },
+  th: { title: 'สร้างบัญชี', subtitle: 'สมัครสมาชิก Kokkok Garden', email: 'อีเมล', password: 'รหัสผ่าน (อย่างน้อย 6 ตัว)', register: 'สมัครสมาชิก', creating: 'กำลังสร้าง...', login: 'กลับไปเข้าสู่ระบบ', minChars: 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร', failMsg: 'สมัครสมาชิกไม่สำเร็จ กรุณาลองอีกครั้ง', successTitle: 'สร้างบัญชีสำเร็จ', successMsg: 'บัญชีถูกสร้างแล้ว คุณสามารถเข้าสู่ระบบได้', backToLogin: 'ไปเข้าสู่ระบบ' },
+};
+
+function detectLang(): string {
+  if (typeof window === 'undefined') return 'kr';
+  const nav = navigator.language.toLowerCase();
+  if (nav.startsWith('ko')) return 'kr';
+  if (nav.startsWith('zh')) return 'cn';
+  if (nav.startsWith('ja')) return 'jp';
+  if (nav.startsWith('vi')) return 'vn';
+  if (nav.startsWith('th')) return 'th';
+  return 'en';
+}
+
+export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [lang, setLang] = useState('kr');
+  const t = L[lang] ?? L['en'];
+
+  useEffect(() => { setLang(detectLang()); }, []);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,30 +45,24 @@ export default function RegisterAccount() {
     setError('');
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
+      setError(t.minChars);
       setIsLoading(false);
       return;
     }
 
     try {
-      if (supabase) {
-        // Genuine DB Account Creation
-        const { data, error: authError } = await supabase.auth.signUp({
-          email: email.trim(),
-          password: password.trim(),
-        });
-        
-        if (authError) {
-           setError(authError.message);
-        } else {
-           setSuccess(true);
-        }
+      if (!supabase) throw new Error('No client');
+      const { error: authError } = await supabase.auth.signUp({
+        email: email.trim(),
+        password: password.trim(),
+      });
+      if (authError) {
+        setError(authError.message);
       } else {
-        // Simulation Environment Trigger
-        throw new Error("No database connected.");
+        setSuccess(true);
       }
-    } catch (err) {
-      setError('회원가입에 실패했습니다. 다시 시도해주세요.');
+    } catch {
+      setError(t.failMsg);
     } finally {
       setIsLoading(false);
     }
@@ -58,12 +75,10 @@ export default function RegisterAccount() {
           <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6 text-green-600 font-extrabold text-2xl">
             ✓
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-[#111111] mb-4">Account Created</h1>
-          <p className="text-sm text-gray-500 mb-8 leading-relaxed">
-            Your account has been securely provisioned (or simulated in mock mode). You can now log into the portal.
-          </p>
+          <h1 className="text-2xl font-extrabold tracking-tight text-[#111111] mb-4">{t.successTitle}</h1>
+          <p className="text-sm text-gray-500 mb-8 leading-relaxed">{t.successMsg}</p>
           <Link href="/login" className="px-8 py-3 bg-[#111111] text-white tracking-widest text-xs font-bold w-full block">
-            RETURN TO LOGIN
+            {t.backToLogin}
           </Link>
         </div>
       </div>
@@ -71,60 +86,42 @@ export default function RegisterAccount() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col items-center justify-center font-sans px-4 animate-in fade-in zoom-in-95 duration-500">
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center font-sans px-4 animate-in fade-in duration-500">
       <div className="w-full max-w-sm">
-        
         <div className="text-center mb-10">
-          <div className="w-12 h-12 border border-gray-200 rounded-full flex items-center justify-center mx-auto mb-6 flex-shrink-0 bg-gray-50">
+          <div className="w-12 h-12 border border-gray-200 rounded-full flex items-center justify-center mx-auto mb-6 bg-gray-50">
             <UserPlus className="w-5 h-5 text-[#111111]" />
           </div>
-          <h1 className="text-2xl font-extrabold tracking-tight text-[#111111] mb-2 uppercase">Create Account</h1>
-          <p className="text-sm text-gray-500">Register securely for the Kokkok Garden storefront.</p>
+          <h1 className="text-2xl font-extrabold tracking-tight text-[#111111] mb-2">{t.title}</h1>
+          <p className="text-sm text-gray-500">{t.subtitle}</p>
         </div>
-        
+
         <form onSubmit={handleRegister} className="space-y-6">
           <div className="space-y-4">
-            <div>
-              <input 
-                type="email" 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email Address"
-                required
-                className="w-full bg-white border-b border-gray-200 px-2 py-3 focus:outline-none focus:border-black transition text-sm text-[#111111] placeholder:text-gray-400" 
-              />
-            </div>
-            <div>
-              <input 
-                type="password" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Secure Password (min 6 chars)"
-                required
-                className="w-full bg-white border-b border-gray-200 px-2 py-3 focus:outline-none focus:border-black transition text-sm text-[#111111] placeholder:text-gray-400" 
-              />
-            </div>
+            <input
+              type="email" value={email} onChange={e => setEmail(e.target.value)}
+              placeholder={t.email} required
+              className="w-full bg-white border-b border-gray-200 px-2 py-3 focus:outline-none focus:border-black transition text-sm text-[#111111] placeholder:text-gray-400"
+            />
+            <input
+              type="password" value={password} onChange={e => setPassword(e.target.value)}
+              placeholder={t.password} required
+              className="w-full bg-white border-b border-gray-200 px-2 py-3 focus:outline-none focus:border-black transition text-sm text-[#111111] placeholder:text-gray-400"
+            />
           </div>
 
           {error && <p className="text-red-500 text-xs font-bold text-center">{error}</p>}
 
-          <button 
-            type="submit" 
-            disabled={isLoading}
-            className="w-full bg-[#111111] text-white py-4 rounded-none font-bold tracking-widest text-[13px] hover:bg-black hover:shadow-lg transition-all mt-8 disabled:opacity-50"
-          >
-            {isLoading ? 'CREATING...' : 'REGISTER'}
+          <button type="submit" disabled={isLoading}
+            className="w-full bg-[#111111] text-white py-4 font-bold tracking-widest text-[13px] hover:bg-black hover:shadow-lg transition-all mt-8 disabled:opacity-50">
+            {isLoading ? t.creating : t.register}
           </button>
         </form>
 
         <div className="mt-8 text-center text-sm">
           <Link href="/login" className="text-gray-500 hover:text-black transition-colors font-medium underline underline-offset-4">
-            Back to login
+            {t.login}
           </Link>
-        </div>
-        
-        <div className="mt-12 text-center border-t border-gray-100 pt-6">
-           <p className="text-[11px] font-semibold text-gray-400 tracking-widest uppercase">Secured via Supabase Auth</p>
         </div>
       </div>
     </div>
