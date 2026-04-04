@@ -23,7 +23,8 @@ export default function ProductsAdminPage() {
     originalPrice: '',
     imageUrl: '',       // final URL after upload or manual entry
     imageFile: null as File | null,
-    description: ''
+    description: '',
+    naverStoreUrl: ''
   });
 
   useEffect(() => {
@@ -48,7 +49,8 @@ export default function ProductsAdminPage() {
         price: Number(d.price),
         originalPrice: Number(d.original_price || d.price),
         imageUrl: (d.images && d.images.length > 0) ? d.images[0] : '',
-        is_active: d.is_active
+        is_active: d.is_active,
+        naver_store_url: d.naver_store_url || ''
       })));
     } catch {
       console.warn('DB 연결 실패. 목업 데이터로 전환.');
@@ -116,7 +118,7 @@ export default function ProductsAdminPage() {
 
   const resetModal = () => {
     setIsModalOpen(false);
-    setFormData({ name: '', summary: '', ingredient: '', price: '', originalPrice: '', imageUrl: '', imageFile: null, description: '' });
+    setFormData({ name: '', summary: '', ingredient: '', price: '', originalPrice: '', imageUrl: '', imageFile: null, description: '', naverStoreUrl: '' });
     setPreviewUrl('');
     setUploadProgress('idle');
     setIsSubmitting(false);
@@ -143,7 +145,8 @@ export default function ProductsAdminPage() {
         originalPrice: Number(formData.originalPrice || formData.price),
         imageUrl: finalImageUrl,
         description: formData.description,
-        is_active: true
+        is_active: true,
+        naver_store_url: formData.naverStoreUrl || undefined
       };
 
       // Optimistic UI update
@@ -158,7 +161,8 @@ export default function ProductsAdminPage() {
           original_price: Number(formData.originalPrice || formData.price),
           description: formData.description,
           images: [finalImageUrl],
-          is_active: true
+          is_active: true,
+          naver_store_url: formData.naverStoreUrl || null
         }]);
         if (error) throw error;
         // Refresh from DB to get proper ID
@@ -206,6 +210,7 @@ export default function ProductsAdminPage() {
                 <th className="p-4">상품 개요</th>
                 <th className="p-4">가격</th>
                 <th className="p-4">성분</th>
+                <th className="p-4">구매 링크</th>
                 <th className="p-4">상태</th>
                 <th className="p-4 pr-6 text-right">작업</th>
               </tr>
@@ -230,6 +235,15 @@ export default function ProductsAdminPage() {
                   </td>
                   <td className="p-4 text-gray-600 text-sm font-bold">{item.price.toLocaleString()}원</td>
                   <td className="p-4 text-gray-600 font-mono text-[11px]">{item.ingredient}</td>
+                  <td className="p-4">
+                    {item.naver_store_url ? (
+                      <a href={item.naver_store_url} target="_blank" rel="noopener noreferrer" className="inline-flex px-2 py-0.5 bg-green-50 text-green-700 text-[10px] font-bold rounded tracking-wide hover:bg-green-100 transition-colors">
+                        네이버
+                      </a>
+                    ) : (
+                      <span className="text-[10px] text-gray-300">미설정</span>
+                    )}
+                  </td>
                   <td className="p-4">
                     <button
                       onClick={() => handleToggle(item.id, item.is_active)}
@@ -420,6 +434,19 @@ export default function ProductsAdminPage() {
                   className="w-full border border-gray-200 p-2 text-sm rounded bg-gray-50 focus:bg-white focus:border-black transition outline-none resize-none"
                   placeholder="상품의 주요 특징과 성분을 설명해주세요..."
                 />
+              </div>
+
+              {/* Naver Store URL */}
+              <div className="space-y-1">
+                <label className="text-[11px] font-bold tracking-widest text-gray-500 uppercase">네이버 스토어 URL</label>
+                <input
+                  type="url"
+                  value={formData.naverStoreUrl}
+                  onChange={e => setFormData(prev => ({ ...prev, naverStoreUrl: e.target.value }))}
+                  className="w-full border border-gray-200 p-2 text-sm rounded bg-gray-50 focus:bg-white focus:border-black transition outline-none"
+                  placeholder="https://smartstore.naver.com/kokkok-garden/products/..."
+                />
+                <p className="text-[10px] text-gray-400 mt-1">입력하면 고객이 구매하기 클릭 시 네이버 스토어로 이동합니다. 비워두면 자체 결제(추후 KCP)로 연결됩니다.</p>
               </div>
 
               <div className="pt-4 border-t border-gray-100 flex justify-end gap-3">
