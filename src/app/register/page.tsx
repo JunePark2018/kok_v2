@@ -45,11 +45,7 @@ export default function RegisterAccount() {
         throw new Error("No database connected.");
       }
     } catch (err) {
-      // Mock Fallback for Development Environment
-      console.warn("DB registration failed, using simulation environment.", err);
-      setTimeout(() => {
-        setSuccess(true);
-      }, 800);
+      setError('회원가입에 실패했습니다. 다시 시도해주세요.');
     } finally {
       setIsLoading(false);
     }
