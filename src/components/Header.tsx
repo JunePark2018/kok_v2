@@ -12,13 +12,13 @@ interface HeaderProps {
 }
 
 /* ── i18n utility strings ───────────────────────────────────────────── */
-const UTILITY: Record<string, { join: string; login: string; order: string; recent: string; cs: string }> = {
-  kr: { join: '회원가입', login: '로그인', order: '주문조회', recent: '최근본상품', cs: '고객센터' },
-  en: { join: 'Sign Up', login: 'Login', order: 'Order', recent: 'Recently Viewed', cs: 'Support' },
-  cn: { join: '注册', login: '登录', order: '订单查询', recent: '最近浏览', cs: '客服' },
-  jp: { join: '会員登録', login: 'ログイン', order: '注文照会', recent: '最近見た商品', cs: 'サポート' },
-  vn: { join: 'Đăng ký', login: 'Đăng nhập', order: 'Đơn hàng', recent: 'Đã xem', cs: 'Hỗ trợ' },
-  th: { join: 'สมัครสมาชิก', login: 'เข้าสู่ระบบ', order: 'ติดตามออเดอร์', recent: 'ดูล่าสุด', cs: 'ช่วยเหลือ' },
+const UTILITY: Record<string, { join: string; login: string; logout: string; order: string; recent: string; cs: string }> = {
+  kr: { join: '회원가입', login: '로그인', logout: '로그아웃', order: '주문조회', recent: '최근본상품', cs: '고객센터' },
+  en: { join: 'Sign Up', login: 'Login', logout: 'Logout', order: 'Order', recent: 'Recently Viewed', cs: 'Support' },
+  cn: { join: '注册', login: '登录', logout: '退出', order: '订单查询', recent: '最近浏览', cs: '客服' },
+  jp: { join: '会員登録', login: 'ログイン', logout: 'ログアウト', order: '注文照会', recent: '最近見た商品', cs: 'サポート' },
+  vn: { join: 'Đăng ký', login: 'Đăng nhập', logout: 'Đăng xuất', order: 'Đơn hàng', recent: 'Đã xem', cs: 'Hỗ trợ' },
+  th: { join: 'สมัครสมาชิก', login: 'เข้าสู่ระบบ', logout: 'ออกจากระบบ', order: 'ติดตามออเดอร์', recent: 'ดูล่าสุด', cs: 'ช่วยเหลือ' },
 };
 
 const PRODUCT_MEGA: Record<string, { label: string; items: { name: string; slug: string }[] }[]> = {
@@ -101,8 +101,22 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
           {isAdmin && (
             <Link href="/admin" className="hover:text-black transition-colors text-[#4a7a3e] font-bold">ADMIN</Link>
           )}
-          <Link href="/register" className="hover:text-black transition-colors">{util.join}</Link>
-          <Link href="/login" className="hover:text-black transition-colors">{util.login}</Link>
+          {!isAdmin && (
+            <Link href="/register" className="hover:text-black transition-colors">{util.join}</Link>
+          )}
+          {isAdmin ? (
+            <button
+              onClick={() => {
+                document.cookie = "kokkok_admin_auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+                window.location.reload();
+              }}
+              className="hover:text-black transition-colors"
+            >
+              {util.logout}
+            </button>
+          ) : (
+            <Link href="/login" className="hover:text-black transition-colors">{util.login}</Link>
+          )}
           <Link href={`/${region}/${lang}/orders`} className="hover:text-black transition-colors">{util.order}</Link>
           <Link href={`/${region}/${lang}/recent`} className="hover:text-black transition-colors">{util.recent}</Link>
           <Link href={`/${region}/${lang}/support`} className="hover:text-black transition-colors">{util.cs} ›</Link>
