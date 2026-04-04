@@ -53,6 +53,7 @@ export default function LoginPage() {
           password: password.trim(),
         });
         if (!authError) {
+          document.cookie = "kokkok_auth=true; path=/; max-age=86400; Secure; SameSite=Lax";
           // Check if user is admin
           const { data: { user } } = await supabase.auth.getUser();
           if (user) {
@@ -67,6 +68,7 @@ export default function LoginPage() {
       }
 
       if (id.trim() === 'admin123' && password.trim() === '456789123') {
+        document.cookie = "kokkok_auth=true; path=/; max-age=86400; Secure; SameSite=Lax";
         document.cookie = "kokkok_admin_auth=true; path=/; max-age=86400; Secure; SameSite=Lax";
         window.location.href = '/kr/kr';
       } else {
@@ -74,6 +76,7 @@ export default function LoginPage() {
       }
     } catch {
       if (id.trim() === 'admin123' && password.trim() === '456789123') {
+        document.cookie = "kokkok_auth=true; path=/; max-age=86400; Secure; SameSite=Lax";
         document.cookie = "kokkok_admin_auth=true; path=/; max-age=86400; Secure; SameSite=Lax";
         window.location.href = '/kr/kr';
       } else {

@@ -77,6 +77,7 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
   const [navPages, setNavPages] = useState<{ slug: string; title: Record<string, string> }[]>([]);
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const isLoggedIn = useMemo(() => typeof document !== 'undefined' && document.cookie.includes('kokkok_auth=true'), []);
   const isAdmin = useMemo(() => typeof document !== 'undefined' && document.cookie.includes('kokkok_admin_auth=true'), []);
 
   const fetchNavPages = useCallback(async () => {
@@ -118,12 +119,13 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
           {isAdmin && (
             <Link href="/admin" className="hover:text-black transition-colors text-[#4a7a3e] font-bold">ADMIN</Link>
           )}
-          {!isAdmin && (
+          {!isLoggedIn && (
             <Link href="/register" className="hover:text-black transition-colors">{util.join}</Link>
           )}
-          {isAdmin ? (
+          {isLoggedIn ? (
             <button
               onClick={() => {
+                document.cookie = "kokkok_auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
                 document.cookie = "kokkok_admin_auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
                 window.location.reload();
               }}
