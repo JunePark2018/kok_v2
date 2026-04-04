@@ -11,10 +11,6 @@ const labels: Record<string, {
 }> = {
   kr: { home: '홈', shop: '상품', details: '상품 상세', notFound: '상품을 찾을 수 없습니다', detailView: '상품 상세', unavailable: '', visitKr: '' },
   en: { home: 'HOME', shop: 'SHOP', details: 'PRODUCT DETAILS', notFound: 'PRODUCT NOT FOUND', detailView: 'DETAIL VIEW', unavailable: 'This product is available for purchase in South Korea only.', visitKr: 'Visit Korean Store →' },
-  cn: { home: '首页', shop: '商店', details: '商品详情', notFound: '未找到商品', detailView: '商品详细图片', unavailable: '此产品仅在韩国销售。', visitKr: '访问韩国商店 →' },
-  jp: { home: 'ホーム', shop: 'ショップ', details: '商品詳細', notFound: '商品が見つかりません', detailView: '詳細画像', unavailable: 'この商品は韓国のみでご購入いただけます。', visitKr: '韓国ストアへ →' },
-  vn: { home: 'TRANG CHỦ', shop: 'CỬA HÀNG', details: 'CHI TIẾT SẢN PHẨM', notFound: 'KHÔNG TÌM THẤY SẢN PHẨM', detailView: 'ẢNH CHI TIẾT', unavailable: 'Sản phẩm này chỉ có thể mua tại Hàn Quốc.', visitKr: 'Đến Cửa Hàng Hàn Quốc →' },
-  th: { home: 'หน้าหลัก', shop: 'ร้านค้า', details: 'รายละเอียดสินค้า', notFound: 'ไม่พบสินค้า', detailView: 'ภาพรายละเอียด', unavailable: 'สินค้านี้วางจำหน่ายในเกาหลีใต้เท่านั้น', visitKr: 'ไปที่ร้านค้าเกาหลี →' },
 };
 
 interface Props {

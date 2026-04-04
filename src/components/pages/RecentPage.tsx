@@ -9,10 +9,6 @@ import { useI18n } from '@/lib/i18n/context';
 const labels: Record<string, { title: string; sub: string; empty: string; emptyDesc: string; shop: string; clear: string; clearConfirm: string }> = {
   kr: { title: '최근 본 상품', sub: '최근에 살펴본 상품들입니다.', empty: '최근 본 상품이 없습니다', emptyDesc: '상품을 둘러보세요!', shop: '쇼핑하러 가기', clear: '전체 삭제', clearConfirm: '최근 본 상품 목록을 삭제하시겠습니까?' },
   en: { title: 'Recently Viewed', sub: 'Products you recently browsed.', empty: 'No recently viewed products', emptyDesc: 'Start browsing products!', shop: 'Go Shopping', clear: 'Clear All', clearConfirm: 'Clear all recently viewed items?' },
-  cn: { title: '最近浏览', sub: '您最近浏览过的商品。', empty: '暂无浏览记录', emptyDesc: '去逛逛吧！', shop: '去购物', clear: '清空', clearConfirm: '清空所有最近浏览记录？' },
-  jp: { title: '最近見た商品', sub: '最近ご覧になった商品です。', empty: '閲覧履歴がありません', emptyDesc: '商品をご覧ください！', shop: 'ショッピングへ', clear: 'すべて削除', clearConfirm: '閲覧履歴をすべて削除しますか？' },
-  vn: { title: 'Đã xem gần đây', sub: 'Sản phẩm bạn đã xem gần đây.', empty: 'Chưa có sản phẩm nào', emptyDesc: 'Hãy khám phá sản phẩm!', shop: 'Mua sắm', clear: 'Xóa tất cả', clearConfirm: 'Xóa tất cả sản phẩm đã xem?' },
-  th: { title: 'ดูล่าสุด', sub: 'สินค้าที่คุณเพิ่งดู', empty: 'ยังไม่มีสินค้าที่ดูล่าสุด', emptyDesc: 'ลองดูสินค้าสิ!', shop: 'ไปช้อปปิ้ง', clear: 'ลบทั้งหมด', clearConfirm: 'ลบรายการสินค้าที่ดูล่าสุดทั้งหมด?' },
 };
 
 function formatTimeAgo(timestamp: number, lang: string): string {

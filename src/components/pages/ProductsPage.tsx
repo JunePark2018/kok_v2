@@ -9,10 +9,6 @@ const labels: Record<string, {
 }> = {
   kr: { title: 'SHOP ALL', sub: '카테고리별로 제품을 확인하세요.', all: '전체', count: '총 {n}개의 상품' },
   en: { title: 'SHOP ALL', sub: 'Browse products by category.', all: 'All', count: '{n} Products' },
-  cn: { title: '全部商品', sub: '按分类浏览所有产品。', all: '全部', count: '共 {n} 件商品' },
-  jp: { title: '全商品', sub: 'カテゴリ別に全商品をご覧ください。', all: 'すべて', count: '全 {n} 件' },
-  vn: { title: 'TẤT CẢ SẢN PHẨM', sub: 'Duyệt sản phẩm theo danh mục.', all: 'Tất Cả', count: '{n} Sản Phẩm' },
-  th: { title: 'สินค้าทั้งหมด', sub: 'เลือกสินค้าตามหมวดหมู่', all: 'ทั้งหมด', count: 'สินค้าทั้งหมด {n} รายการ' },
 };
 
 interface Props {

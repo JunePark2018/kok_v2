@@ -19,19 +19,11 @@ interface HeaderProps {
 const UTILITY: Record<string, { join: string; login: string; logout: string; order: string; recent: string; cs: string }> = {
   kr: { join: '회원가입', login: '로그인', logout: '로그아웃', order: '주문조회', recent: '최근본상품', cs: '고객센터' },
   en: { join: 'Sign Up', login: 'Login', logout: 'Logout', order: 'Order', recent: 'Recently Viewed', cs: 'Support' },
-  cn: { join: '注册', login: '登录', logout: '退出', order: '订单查询', recent: '最近浏览', cs: '客服' },
-  jp: { join: '会員登録', login: 'ログイン', logout: 'ログアウト', order: '注文照会', recent: '最近見た商品', cs: 'サポート' },
-  vn: { join: 'Đăng ký', login: 'Đăng nhập', logout: 'Đăng xuất', order: 'Đơn hàng', recent: 'Đã xem', cs: 'Hỗ trợ' },
-  th: { join: 'สมัครสมาชิก', login: 'เข้าสู่ระบบ', logout: 'ออกจากระบบ', order: 'ติดตามออเดอร์', recent: 'ดูล่าสุด', cs: 'ช่วยเหลือ' },
 };
 
 const NAV_LABELS: Record<string, { product: string; event: string; brand: string; review: string; global: string; worldwide: string; contact: string }> = {
   kr: { product: 'Product', event: 'EVENT & NOTICE', brand: 'BRAND STORY', review: 'REVIEW & COMMUNITY', global: 'SHOP Worldwide', worldwide: 'SHOP Worldwide', contact: '고객센터' },
   en: { product: 'Product', event: 'EVENT & NOTICE', brand: 'BRAND STORY', review: 'REVIEWS', global: 'SHOP Worldwide', worldwide: 'SHOP Worldwide', contact: 'Contact' },
-  cn: { product: '商品', event: '活动 & 通知', brand: '品牌故事', review: '评价社区', global: '全球购物', worldwide: '全球购物', contact: '联系我们' },
-  jp: { product: '商品', event: 'イベント & お知らせ', brand: 'ブランドストーリー', review: 'レビュー', global: 'ショップ全世界', worldwide: 'ショップ全世界', contact: 'お問い合わせ' },
-  vn: { product: 'Sản Phẩm', event: 'SỰ KIỆN & TIN TỨC', brand: 'CÂU CHUYỆN THƯƠNG HIỆU', review: 'ĐÁNH GIÁ', global: 'MUA HÀNG TOÀN CẦU', worldwide: 'MUA HÀNG TOÀN CẦU', contact: 'Liên Hệ' },
-  th: { product: 'สินค้า', event: 'อีเวนต์ & ข่าวสาร', brand: 'เรื่องราวแบรนด์', review: 'รีวิว', global: 'ช้อปทั่วโลก', worldwide: 'ช้อปทั่วโลก', contact: 'ติดต่อเรา' },
 };
 
 export default function Header({ canPurchase = true, region = 'kr' }: HeaderProps) {

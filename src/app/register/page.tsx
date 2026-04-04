@@ -11,16 +11,12 @@ const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabase
 const L: Record<string, { title: string; subtitle: string; email: string; password: string; register: string; creating: string; login: string; minChars: string; failMsg: string; successTitle: string; successMsg: string; backToLogin: string }> = {
   kr: { title: '회원가입', subtitle: '콕콕가든 계정을 만드세요.', email: '이메일 주소', password: '비밀번호 (6자 이상)', register: '회원가입', creating: '생성 중...', login: '로그인으로 돌아가기', minChars: '비밀번호는 6자 이상이어야 합니다.', failMsg: '회원가입에 실패했습니다. 다시 시도해주세요.', successTitle: '가입 완료', successMsg: '계정이 생성되었습니다. 이제 로그인할 수 있습니다.', backToLogin: '로그인하기' },
   en: { title: 'Create Account', subtitle: 'Register for Kokkok Garden.', email: 'Email Address', password: 'Password (min 6 chars)', register: 'REGISTER', creating: 'CREATING...', login: 'Back to login', minChars: 'Password must be at least 6 characters.', failMsg: 'Registration failed. Please try again.', successTitle: 'Account Created', successMsg: 'Your account has been created. You can now log in.', backToLogin: 'GO TO LOGIN' },
-  cn: { title: '注册账号', subtitle: '注册Kokkok Garden账号', email: '电子邮箱', password: '密码 (至少6位)', register: '注册', creating: '创建中...', login: '返回登录', minChars: '密码至少需要6个字符。', failMsg: '注册失败，请重试。', successTitle: '注册成功', successMsg: '账号已创建，现在可以登录了。', backToLogin: '去登录' },
-  jp: { title: 'アカウント作成', subtitle: 'コッコクガーデンに登録', email: 'メールアドレス', password: 'パスワード (6文字以上)', register: '登録', creating: '作成中...', login: 'ログインに戻る', minChars: 'パスワードは6文字以上必要です。', failMsg: '登録に失敗しました。再度お試しください。', successTitle: '登録完了', successMsg: 'アカウントが作成されました。ログインできます。', backToLogin: 'ログインへ' },
-  vn: { title: 'Tạo tài khoản', subtitle: 'Đăng ký tài khoản Kokkok Garden.', email: 'Địa chỉ email', password: 'Mật khẩu (tối thiểu 6 ký tự)', register: 'ĐĂNG KÝ', creating: 'ĐANG TẠO...', login: 'Quay lại đăng nhập', minChars: 'Mật khẩu phải có ít nhất 6 ký tự.', failMsg: 'Đăng ký thất bại. Vui lòng thử lại.', successTitle: 'Tạo tài khoản thành công', successMsg: 'Tài khoản đã được tạo. Bạn có thể đăng nhập ngay.', backToLogin: 'ĐI ĐẾN ĐĂNG NHẬP' },
-  th: { title: 'สร้างบัญชี', subtitle: 'สมัครสมาชิก Kokkok Garden', email: 'อีเมล', password: 'รหัสผ่าน (อย่างน้อย 6 ตัว)', register: 'สมัครสมาชิก', creating: 'กำลังสร้าง...', login: 'กลับไปเข้าสู่ระบบ', minChars: 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร', failMsg: 'สมัครสมาชิกไม่สำเร็จ กรุณาลองอีกครั้ง', successTitle: 'สร้างบัญชีสำเร็จ', successMsg: 'บัญชีถูกสร้างแล้ว คุณสามารถเข้าสู่ระบบได้', backToLogin: 'ไปเข้าสู่ระบบ' },
 };
 
 function detectLang(): string {
   if (typeof window === 'undefined') return 'kr';
   const cookie = document.cookie.match(/kokkok_lang=(\w+)/);
-  if (cookie && ['kr','en','cn','jp','vn','th'].includes(cookie[1])) return cookie[1];
+  if (cookie && ['kr','en'].includes(cookie[1])) return cookie[1];
   const nav = navigator.language.toLowerCase();
   if (nav.startsWith('ko')) return 'kr';
   if (nav.startsWith('zh')) return 'cn';

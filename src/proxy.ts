@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 // Valid language codes
-const VALID_LANGS = ['en', 'cn', 'jp', 'vn', 'th', 'kr'];
+const VALID_LANGS = ['kr', 'en'];
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;

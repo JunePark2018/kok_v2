@@ -11,16 +11,12 @@ const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabase
 const L: Record<string, { title: string; subtitle: string; email: string; password: string; signin: string; verifying: string; register: string; error: string }> = {
   kr: { title: '로그인', subtitle: '콕콕가든 스토어에 로그인하세요.', email: '이메일 주소', password: '비밀번호', signin: '로그인', verifying: '확인 중...', register: '회원가입', error: '이메일 또는 비밀번호가 올바르지 않습니다.' },
   en: { title: 'Sign In', subtitle: 'Sign in to Kokkok Garden storefront.', email: 'Email Address', password: 'Password', signin: 'SIGN IN', verifying: 'VERIFYING...', register: 'Create an account', error: 'Invalid email or password.' },
-  cn: { title: '登录', subtitle: '登录Kokkok Garden商城', email: '电子邮箱', password: '密码', signin: '登录', verifying: '验证中...', register: '注册账号', error: '邮箱或密码不正确。' },
-  jp: { title: 'ログイン', subtitle: 'コッコクガーデンにログイン', email: 'メールアドレス', password: 'パスワード', signin: 'ログイン', verifying: '確認中...', register: 'アカウント作成', error: 'メールまたはパスワードが正しくありません。' },
-  vn: { title: 'Đăng nhập', subtitle: 'Đăng nhập vào Kokkok Garden.', email: 'Địa chỉ email', password: 'Mật khẩu', signin: 'ĐĂNG NHẬP', verifying: 'ĐANG XÁC MINH...', register: 'Tạo tài khoản', error: 'Email hoặc mật khẩu không đúng.' },
-  th: { title: 'เข้าสู่ระบบ', subtitle: 'เข้าสู่ระบบ Kokkok Garden', email: 'อีเมล', password: 'รหัสผ่าน', signin: 'เข้าสู่ระบบ', verifying: 'กำลังตรวจสอบ...', register: 'สร้างบัญชี', error: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' },
 };
 
 function detectLang(): string {
   if (typeof window === 'undefined') return 'kr';
   const cookie = document.cookie.match(/kokkok_lang=(\w+)/);
-  if (cookie && ['kr','en','cn','jp','vn','th'].includes(cookie[1])) return cookie[1];
+  if (cookie && ['kr','en'].includes(cookie[1])) return cookie[1];
   const nav = navigator.language.toLowerCase();
   if (nav.startsWith('ko')) return 'kr';
   if (nav.startsWith('zh')) return 'cn';

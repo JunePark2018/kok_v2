@@ -5,8 +5,8 @@ import { Plus, Pencil, Trash2, ChevronRight, X } from 'lucide-react';
 import { supabase } from '@/lib/api/products';
 import type { Category } from '@/lib/api/categories';
 
-const LANGS = ['kr', 'en', 'cn', 'jp', 'vn', 'th'] as const;
-const LANG_LABELS: Record<string, string> = { kr: '한국어', en: 'English', cn: '中文', jp: '日本語', vn: 'Tiếng Việt', th: 'ไทย' };
+const LANGS = ['kr', 'en'] as const;
+const LANG_LABELS: Record<string, string> = { kr: '한국어', en: 'English' };
 
 interface FormData {
   slug: string;

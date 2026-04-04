@@ -76,10 +76,6 @@ const PAGE_LABELS: Record<string, {
 }> = {
   kr: { heroTitle: '전 세계에서 콕콕가든을 만나보세요', heroSub: '글로벌 파트너와 함께하는 K-뷰티', filterLabel: '지역 선택', visitStore: '스토어 방문', comingSoon: '준비중' },
   en: { heroTitle: 'Shop Kokkok Garden Worldwide', heroSub: 'Available across the globe through our trusted partners', filterLabel: 'Filter by Region', visitStore: 'Visit Store', comingSoon: 'Coming Soon' },
-  cn: { heroTitle: '全球购买 Kokkok Garden', heroSub: '通过我们的全球合作伙伴体验韩国美妆', filterLabel: '按地区筛选', visitStore: '访问商店', comingSoon: '即将上线' },
-  jp: { heroTitle: '世界中でコッコクガーデンを', heroSub: 'グローバルパートナーと共にお届けするK-ビューティー', filterLabel: 'エリアで絞り込む', visitStore: 'ストアへ', comingSoon: '準備中' },
-  vn: { heroTitle: 'Mua Kokkok Garden Toàn Cầu', heroSub: 'Có mặt khắp nơi qua các đối tác tin cậy của chúng tôi', filterLabel: 'Lọc theo khu vực', visitStore: 'Ghé Cửa Hàng', comingSoon: 'Sắp Ra Mắt' },
-  th: { heroTitle: 'ช้อป Kokkok Garden ทั่วโลก', heroSub: 'พบกับผลิตภัณฑ์ K-Beauty ผ่านพาร์ทเนอร์ทั่วโลก', filterLabel: 'กรองตามภูมิภาค', visitStore: 'เข้าร้านค้า', comingSoon: 'เร็วๆ นี้' },
 };
 
 interface ShopWorldwideProps { lang: string; }

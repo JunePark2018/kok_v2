@@ -42,10 +42,6 @@ export default async function MenuPage({ slug, lang, region }: Props) {
   const lb: Record<string, { empty: string; write: string; author: string; date: string }> = {
     kr: { empty: '등록된 게시글이 없습니다.', write: '글쓰기', author: '작성자', date: '작성일' },
     en: { empty: 'No posts yet.', write: 'Write', author: 'Author', date: 'Date' },
-    cn: { empty: '暂无帖子。', write: '发帖', author: '作者', date: '日期' },
-    jp: { empty: '投稿がありません。', write: '投稿する', author: '投稿者', date: '日付' },
-    vn: { empty: 'Chưa có bài viết.', write: 'Viết bài', author: 'Tác giả', date: 'Ngày' },
-    th: { empty: 'ยังไม่มีโพสต์', write: 'เขียน', author: 'ผู้เขียน', date: 'วันที่' },
   };
   const l = lb[lang] ?? lb['en'];
 
