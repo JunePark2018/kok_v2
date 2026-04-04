@@ -7,6 +7,7 @@ import LanguagePicker from '@/components/LanguagePicker';
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { supabase } from '@/lib/api/products';
 import { getCategoriesTree, type CategoryWithChildren } from '@/lib/api/categories';
+import { getMenuTree, type MenuWithChildren } from '@/lib/api/menus';
 import { useCart } from '@/lib/cart/CartContext';
 
 interface HeaderProps {
@@ -41,23 +42,17 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
-  const [navPages, setNavPages] = useState<{ slug: string; title: Record<string, string> }[]>([]);
+  const [navMenus, setNavMenus] = useState<MenuWithChildren[]>([]);
   const [megaCategories, setMegaCategories] = useState<CategoryWithChildren[]>([]);
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isLoggedIn = useMemo(() => typeof document !== 'undefined' && document.cookie.includes('kokkok_auth=true'), []);
   const isAdmin = useMemo(() => typeof document !== 'undefined' && document.cookie.includes('kokkok_admin_auth=true'), []);
 
-  const fetchNavPages = useCallback(async () => {
+  const fetchNavMenus = useCallback(async () => {
     try {
-      if (!supabase) return;
-      const { data } = await supabase
-        .from('pages')
-        .select('slug, title')
-        .eq('show_in_nav', true)
-        .eq('is_published', true)
-        .order('nav_order', { ascending: true });
-      if (data) setNavPages(data);
+      const tree = await getMenuTree();
+      setNavMenus(tree.filter(m => m.show_in_nav));
     } catch { /* ignore */ }
   }, []);
 
@@ -68,7 +63,7 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
     } catch { /* ignore */ }
   }, []);
 
-  useEffect(() => { fetchNavPages(); fetchCategories(); }, [fetchNavPages, fetchCategories]);
+  useEffect(() => { fetchNavMenus(); fetchCategories(); }, [fetchNavMenus, fetchCategories]);
   const util = UTILITY[lang] ?? UTILITY['en'];
   const nav = NAV_LABELS[lang] ?? NAV_LABELS['en'];
 
@@ -176,16 +171,28 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
                 )}
               </div>
 
-              {/* Dynamic CMS pages from DB */}
-              {navPages.map(page => (
-                <Link
-                  key={page.slug}
-                  href={`/${region}/${lang}/pages/${page.slug}`}
-                  className="px-4 h-full flex items-center text-[13.5px] font-semibold text-neutral-800 hover:text-black tracking-wide transition-colors"
-                >
-                  {page.title?.[lang] || page.title?.kr || page.title?.en || ''}
-                </Link>
-              ))}
+              {/* Dynamic menus from DB */}
+              {navMenus.map(menu => {
+                const hasChildren = menu.children.length > 0;
+                const menuLabel = menu.title?.[lang] || menu.title?.kr || menu.title?.en || menu.slug;
+                if (!hasChildren) {
+                  return (
+                    <Link key={menu.slug} href={`/${region}/${lang}/menus/${menu.slug}`} className="px-4 h-full flex items-center text-[13.5px] font-semibold text-neutral-800 hover:text-black tracking-wide transition-colors">
+                      {menuLabel}
+                    </Link>
+                  );
+                }
+                return (
+                  <div key={menu.slug} className="relative h-full flex items-center" onMouseEnter={() => openMenu(`menu-${menu.slug}`)} onMouseLeave={closeMenu}>
+                    <Link href={`/${region}/${lang}/menus/${menu.slug}`} className={`flex items-center gap-1 px-4 h-full text-[13.5px] font-semibold tracking-wide transition-colors ${activeMenu === `menu-${menu.slug}` ? 'text-black' : 'text-neutral-800 hover:text-black'}`}>
+                      {menuLabel}
+                    </Link>
+                    {activeMenu === `menu-${menu.slug}` && (
+                      <span className="absolute bottom-0 left-4 right-4 h-[2.5px] bg-[#4a7a3e] rounded-full" />
+                    )}
+                  </div>
+                );
+              })}
 
               {/* Shop Worldwide — direct link */}
               <Link
@@ -258,12 +265,37 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
           </div>
         )}
 
+      {/* ── Menu Mega Menus ─────────────────────────────────────────── */}
+        {navMenus.filter(m => m.children.length > 0).map(menu => (
+          activeMenu === `menu-${menu.slug}` && (
+            <div
+              key={menu.slug}
+              className="absolute top-full left-0 w-full bg-white border-t border-neutral-100 shadow-lg z-30"
+              onMouseEnter={keepMenu}
+              onMouseLeave={closeMenu}
+            >
+              <div className="max-w-[1600px] mx-auto px-8 py-6 flex gap-12">
+                {menu.children.map(child => (
+                  <Link
+                    key={child.slug}
+                    href={`/${region}/${lang}/menus/${child.slug}`}
+                    className="text-[13px] font-bold text-neutral-900 hover:text-[#4a7a3e] tracking-wide transition-colors"
+                    onClick={() => setActiveMenu(null)}
+                  >
+                    {child.title?.[lang] || child.title?.kr || child.title?.en || child.slug}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )
+        ))}
+
       {/* ── Mobile Menu Drawer ───────────────────────────────────────── */}
         {mobileOpen && (
           <div className="lg:hidden bg-white border-t border-neutral-100 px-6 py-4 space-y-4 animate-in slide-in-from-top-2 duration-200">
             <Link href={`/${region}/${lang}/products`} className="block text-sm font-bold text-neutral-800 py-2 border-b border-neutral-100" onClick={() => setMobileOpen(false)}>{nav.product}</Link>
-            {navPages.map(page => (
-              <Link key={page.slug} href={`/${region}/${lang}/pages/${page.slug}`} className="block text-sm font-bold text-neutral-800 py-2 border-b border-neutral-100" onClick={() => setMobileOpen(false)}>{page.title?.[lang] || page.title?.kr || page.title?.en || ''}</Link>
+            {navMenus.map(menu => (
+              <Link key={menu.slug} href={`/${region}/${lang}/menus/${menu.slug}`} className="block text-sm font-bold text-neutral-800 py-2 border-b border-neutral-100" onClick={() => setMobileOpen(false)}>{menu.title?.[lang] || menu.title?.kr || menu.title?.en || ''}</Link>
             ))}
             <Link href={`/${region}/${lang}/worldwide`} className="flex items-center gap-2 text-sm font-bold text-neutral-800 py-2 border-b border-neutral-100" onClick={() => setMobileOpen(false)}>
               <Globe className="w-4 h-4" /> {nav.worldwide}
