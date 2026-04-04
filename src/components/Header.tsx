@@ -253,7 +253,7 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
               <button onClick={() => setSearchOpen(v => !v)} className="p-2 text-neutral-900 hover:opacity-60 transition-opacity" aria-label="Search">
                 <Search className="w-[21px] h-[21px]" />
               </button>
-              <Link href="/login" className="hidden sm:flex p-2 text-neutral-900 hover:opacity-60 transition-opacity" aria-label="Account">
+              <Link href={isLoggedIn ? `/${region}/${lang}/mypage` : '/login'} className="hidden sm:flex p-2 text-neutral-900 hover:opacity-60 transition-opacity" aria-label="Account">
                 <User className="w-[21px] h-[21px]" />
               </Link>
               {canPurchase && (

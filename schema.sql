@@ -71,6 +71,14 @@ CREATE TABLE public.pages (
   updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
+CREATE TABLE public.wishlist (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid REFERENCES public.users(id) ON DELETE CASCADE,
+  product_id uuid REFERENCES public.products(id) ON DELETE CASCADE,
+  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+  UNIQUE(user_id, product_id)
+);
+
 -- 3. Enable Row Level Security (RLS)
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
@@ -79,6 +87,7 @@ ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.cart_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.shorts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.pages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.wishlist ENABLE ROW LEVEL SECURITY;
 
 -- 4. Create RLS Policies
 
@@ -130,6 +139,16 @@ CREATE POLICY "Shorts are viewable by everyone" ON public.shorts
 -- SHORTS: Insertable/deletable by anyone (anon key for admin mock auth)
 CREATE POLICY "Shorts are manageable" ON public.shorts
   FOR ALL USING (true);
+
+-- WISHLIST: Users can manage their own wishlist
+CREATE POLICY "Users can view own wishlist" ON public.wishlist
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can add to own wishlist" ON public.wishlist
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can remove from own wishlist" ON public.wishlist
+  FOR DELETE USING (auth.uid() = user_id);
 
 -- PAGES: Readable by everyone
 CREATE POLICY "Pages are viewable by everyone" ON public.pages
