@@ -1,6 +1,6 @@
 'use client';
 
-import { Package, Video, RefreshCw, Globe, Eye } from 'lucide-react';
+import { Package, Video, RefreshCw, Globe, Eye, Heart, ArrowUpDown, ChevronUp, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/api/products';
@@ -18,17 +18,28 @@ interface CountryStat {
   count: number;
 }
 
-interface TopPage {
-  path: string;
-  count: number;
+interface ProductClick {
+  id: string;
+  name: string;
+  clicks: number;
 }
+
+interface WishRank {
+  id: string;
+  name: string;
+  wishCount: number;
+}
+
+type SortDir = 'asc' | 'desc';
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats>({
     totalProducts: 0, activeProducts: 0, totalShorts: 0, totalVisits: 0, isLive: false,
   });
   const [countries, setCountries] = useState<CountryStat[]>([]);
-  const [topPages, setTopPages] = useState<TopPage[]>([]);
+  const [productClicks, setProductClicks] = useState<ProductClick[]>([]);
+  const [wishRanks, setWishRanks] = useState<WishRank[]>([]);
+  const [clickSort, setClickSort] = useState<SortDir>('desc');
   const [isLoading, setIsLoading] = useState(true);
 
   async function fetchStats() {
@@ -45,31 +56,63 @@ export default function AdminDashboard() {
 
       if (productsRes.error && activeRes.error) throw new Error('DB error');
 
-      // Fetch country breakdown
-      const { data: analyticsData } = await supabase
-        .from('analytics')
-        .select('country, path');
+      // Fetch all analytics + products + wishlist in parallel
+      const [analyticsRes, allProductsRes, wishlistRes] = await Promise.all([
+        supabase.from('analytics').select('country, path'),
+        supabase.from('products').select('id, name'),
+        supabase.from('wishlist').select('product_id'),
+      ]);
 
+      // Country breakdown
       const countryMap: Record<string, number> = {};
-      const pageMap: Record<string, number> = {};
-      if (analyticsData) {
-        for (const row of analyticsData) {
+      const productClickMap: Record<string, number> = {};
+      if (analyticsRes.data) {
+        for (const row of analyticsRes.data) {
           countryMap[row.country || 'UNKNOWN'] = (countryMap[row.country || 'UNKNOWN'] || 0) + 1;
-          pageMap[row.path || '/'] = (pageMap[row.path || '/'] || 0) + 1;
+          // Count product detail page views: /kr/xx/products/ID or /gl/xx/products/ID
+          const match = row.path?.match(/\/products\/([^/]+)$/);
+          if (match) {
+            productClickMap[match[1]] = (productClickMap[match[1]] || 0) + 1;
+          }
         }
       }
 
-      const sortedCountries = Object.entries(countryMap)
-        .map(([country, count]) => ({ country, count }))
-        .sort((a, b) => b.count - a.count);
+      setCountries(
+        Object.entries(countryMap)
+          .map(([country, count]) => ({ country, count }))
+          .sort((a, b) => b.count - a.count)
+      );
 
-      const sortedPages = Object.entries(pageMap)
-        .map(([path, count]) => ({ path, count }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 10);
+      // Product clicks with names
+      const productNameMap: Record<string, string> = {};
+      if (allProductsRes.data) {
+        for (const p of allProductsRes.data) productNameMap[p.id] = p.name;
+      }
 
-      setCountries(sortedCountries);
-      setTopPages(sortedPages);
+      const clicks: ProductClick[] = Object.entries(productClickMap)
+        .filter(([id]) => productNameMap[id])
+        .map(([id, clicks]) => ({ id, name: productNameMap[id], clicks }));
+      // Also add products with 0 clicks
+      if (allProductsRes.data) {
+        for (const p of allProductsRes.data) {
+          if (!productClickMap[p.id]) clicks.push({ id: p.id, name: p.name, clicks: 0 });
+        }
+      }
+      setProductClicks(clicks);
+
+      // Wishlist ranking
+      const wishMap: Record<string, number> = {};
+      if (wishlistRes.data) {
+        for (const w of wishlistRes.data) {
+          wishMap[w.product_id] = (wishMap[w.product_id] || 0) + 1;
+        }
+      }
+      setWishRanks(
+        Object.entries(wishMap)
+          .filter(([id]) => productNameMap[id])
+          .map(([id, wishCount]) => ({ id, name: productNameMap[id], wishCount }))
+          .sort((a, b) => b.wishCount - a.wishCount)
+      );
 
       setStats({
         totalProducts: productsRes.count ?? 0,
@@ -92,6 +135,10 @@ export default function AdminDashboard() {
     FR: '프랑스', SG: '싱가포르', AU: '호주', CA: '캐나다', TH: '태국',
     VN: '베트남', TW: '대만', HK: '홍콩', UNKNOWN: '알 수 없음',
   };
+
+  const sortedClicks = [...productClicks].sort((a, b) =>
+    clickSort === 'desc' ? b.clicks - a.clicks : a.clicks - b.clicks
+  );
 
   const cards = [
     { title: '전체 상품', value: stats.totalProducts, icon: Package, color: 'bg-blue-500', href: '/admin/products' },
@@ -134,8 +181,8 @@ export default function AdminDashboard() {
         })}
       </div>
 
-      {/* Analytics section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Analytics section - row 1 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {/* Country breakdown */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center gap-2 mb-5">
@@ -167,26 +214,94 @@ export default function AdminDashboard() {
           )}
         </div>
 
-        {/* Top pages */}
+        {/* Wishlist ranking */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center gap-2 mb-5">
-            <Eye className="w-5 h-5 text-gray-400" />
-            <h3 className="font-bold text-gray-800">인기 페이지</h3>
+            <Heart className="w-5 h-5 text-gray-400" />
+            <h3 className="font-bold text-gray-800">위시리스트 인기 상품</h3>
           </div>
-          {topPages.length === 0 ? (
-            <p className="text-sm text-gray-400 py-8 text-center">아직 방문 데이터가 없습니다</p>
+          {wishRanks.length === 0 ? (
+            <p className="text-sm text-gray-400 py-8 text-center">아직 위시리스트 데이터가 없습니다</p>
           ) : (
             <div className="space-y-2">
-              {topPages.map(({ path, count }, i) => (
-                <div key={path} className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0">
-                  <span className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-[10px] font-bold text-gray-500">{i + 1}</span>
-                  <span className="text-sm text-gray-700 font-mono truncate flex-1">{path}</span>
-                  <span className="text-xs font-bold text-gray-400">{count}</span>
+              {wishRanks.slice(0, 10).map((item, i) => (
+                <div key={item.id} className="flex items-center gap-3 py-2.5 border-b border-gray-50 last:border-0">
+                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                    i === 0 ? 'bg-yellow-100 text-yellow-700' : i === 1 ? 'bg-gray-200 text-gray-600' : i === 2 ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-500'
+                  }`}>{i + 1}</span>
+                  <span className="text-sm text-gray-800 font-medium truncate flex-1">{item.name}</span>
+                  <span className="text-xs font-bold text-red-400 flex items-center gap-1">
+                    <Heart className="w-3 h-3 fill-current" /> {item.wishCount}
+                  </span>
                 </div>
               ))}
             </div>
           )}
         </div>
+      </div>
+
+      {/* Product clicks - full width */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-2">
+            <Eye className="w-5 h-5 text-gray-400" />
+            <h3 className="font-bold text-gray-800">제품별 클릭수</h3>
+          </div>
+          <button
+            onClick={() => setClickSort(prev => prev === 'desc' ? 'asc' : 'desc')}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-gray-500 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <ArrowUpDown className="w-3.5 h-3.5" />
+            {clickSort === 'desc' ? '높은순' : '낮은순'}
+          </button>
+        </div>
+        {sortedClicks.length === 0 ? (
+          <p className="text-sm text-gray-400 py-8 text-center">상품 데이터가 없습니다</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-gray-100 text-xs text-gray-500 font-semibold uppercase tracking-wider">
+                  <th className="py-3 pl-2 w-10">#</th>
+                  <th className="py-3">상품명</th>
+                  <th className="py-3 text-right pr-2">
+                    <button onClick={() => setClickSort(prev => prev === 'desc' ? 'asc' : 'desc')}
+                      className="inline-flex items-center gap-1 hover:text-gray-800 transition-colors">
+                      클릭수
+                      {clickSort === 'desc' ? <ChevronDown className="w-3 h-3" /> : <ChevronUp className="w-3 h-3" />}
+                    </button>
+                  </th>
+                  <th className="py-3 pr-4 w-48">비율</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {sortedClicks.map((item, i) => {
+                  const maxClicks = Math.max(...productClicks.map(p => p.clicks), 1);
+                  const pct = Math.round((item.clicks / maxClicks) * 100);
+                  return (
+                    <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
+                      <td className="py-3 pl-2 text-xs text-gray-400 font-bold">{i + 1}</td>
+                      <td className="py-3">
+                        <Link href={`/admin/products`} className="text-sm font-medium text-gray-800 hover:text-black transition-colors">
+                          {item.name}
+                        </Link>
+                      </td>
+                      <td className="py-3 text-right pr-2">
+                        <span className="text-sm font-bold text-gray-900">{item.clicks}</span>
+                        <span className="text-xs text-gray-400 ml-1">회</span>
+                      </td>
+                      <td className="py-3 pr-4">
+                        <div className="w-full bg-gray-100 rounded-full h-2">
+                          <div className="bg-orange-400 h-2 rounded-full transition-all" style={{ width: `${pct}%` }} />
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
