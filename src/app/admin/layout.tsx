@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Users, Package, Video, LayoutDashboard, LogOut, FileText } from 'lucide-react';
+import { Users, Package, Video, LayoutDashboard, LogOut, FileText, ExternalLink } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -50,8 +50,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           })}
         </nav>
 
-        <div className="p-4 border-t border-gray-800">
-          <button 
+        <div className="p-4 border-t border-gray-800 space-y-1">
+          <Link
+            href="/kr/kr"
+            className="w-full flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors"
+          >
+            <ExternalLink className="w-5 h-5" />
+            스토어 보기
+          </Link>
+          <button
             onClick={() => {
               document.cookie = "kokkok_admin_auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
               window.location.href = '/';
