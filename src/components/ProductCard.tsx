@@ -5,6 +5,7 @@ import { ShoppingBag, Heart } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/context';
 import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
+import { useCart } from '@/lib/cart/CartContext';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
@@ -23,8 +24,18 @@ interface ProductCardProps {
 
 export default function ProductCard({ id, name, summary, price, originalPrice, discountRate, imageUrl, canPurchase = true }: ProductCardProps) {
   const { t, lang, region } = useI18n();
+  const { addItem } = useCart();
   const [wishlisted, setWishlisted] = useState(false);
   const [wishLoading, setWishLoading] = useState(false);
+  const [cartAdded, setCartAdded] = useState(false);
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addItem({ productId: id, name, price, originalPrice, imageUrl });
+    setCartAdded(true);
+    setTimeout(() => setCartAdded(false), 1500);
+  };
 
   useEffect(() => {
     (async () => {
@@ -79,8 +90,13 @@ export default function ProductCard({ id, name, summary, price, originalPrice, d
               <Heart className={`w-4 h-4 ${wishlisted ? 'fill-current' : ''}`} />
             </button>
             {canPurchase && (
-              <button className="w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm shadow-md flex items-center justify-center hover:bg-black hover:text-white transition-colors">
-                <ShoppingBag className="w-4 h-4" />
+              <button
+                onClick={handleAddToCart}
+                className={`w-9 h-9 rounded-full backdrop-blur-sm shadow-md flex items-center justify-center transition-colors ${
+                  cartAdded ? 'bg-green-500 text-white' : 'bg-white/90 text-neutral-600 hover:bg-black hover:text-white'
+                }`}
+              >
+                {cartAdded ? <span className="text-xs font-bold">✓</span> : <ShoppingBag className="w-4 h-4" />}
               </button>
             )}
           </div>

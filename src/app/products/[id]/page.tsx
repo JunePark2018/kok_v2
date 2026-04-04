@@ -72,7 +72,7 @@ export default async function ProductDetail({ params }: { params: Promise<{ id: 
             </p>
           </div>
 
-          <ProductActionButtons productId={id} price={productData.price} />
+          <ProductActionButtons productId={id} productName={name} price={productData.price} originalPrice={productData.originalPrice} imageUrl={productData.imageUrl} naverStoreUrl={productData.naver_store_url} />
         </div>
       </div>
       

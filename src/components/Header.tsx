@@ -7,6 +7,7 @@ import LanguagePicker from '@/components/LanguagePicker';
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { supabase } from '@/lib/api/products';
 import { getCategoriesTree, type CategoryWithChildren } from '@/lib/api/categories';
+import { useCart } from '@/lib/cart/CartContext';
 
 interface HeaderProps {
   canPurchase?: boolean;
@@ -34,6 +35,7 @@ const NAV_LABELS: Record<string, { product: string; event: string; brand: string
 
 export default function Header({ canPurchase = true, region = 'kr' }: HeaderProps) {
   const { lang } = useI18n();
+  const { totalCount } = useCart();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -203,14 +205,14 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
                 <User className="w-[21px] h-[21px]" />
               </Link>
               {canPurchase && (
-                <div className="relative group">
-                  <Link href="/cart" className="p-2 text-neutral-900 hover:opacity-60 transition-opacity flex" aria-label="Cart">
-                    <ShoppingBag className="w-[21px] h-[21px]" />
-                  </Link>
-                  <div className="absolute top-10 right-0 hidden group-hover:block whitespace-nowrap bg-[#8eaad9] text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow z-50 animate-in fade-in duration-150">
-                    신규회원 5,000원 쿠폰
-                  </div>
-                </div>
+                <Link href="/cart" className="relative p-2 text-neutral-900 hover:opacity-60 transition-opacity flex" aria-label="Cart">
+                  <ShoppingBag className="w-[21px] h-[21px]" />
+                  {totalCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 w-[18px] h-[18px] bg-[#111] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                      {totalCount > 99 ? '99' : totalCount}
+                    </span>
+                  )}
+                </Link>
               )}
               <LanguagePicker />
             </div>

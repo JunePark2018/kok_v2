@@ -119,7 +119,7 @@ export default async function ProductDetailPage({ lang, region, canPurchase, id 
           )}
 
           {canPurchase ? (
-            <ProductActionButtons productId={id} price={productData.price} naverStoreUrl={productData.naver_store_url} />
+            <ProductActionButtons productId={id} productName={productData.name} price={productData.price} originalPrice={productData.originalPrice} imageUrl={productData.imageUrl} naverStoreUrl={productData.naver_store_url} />
           ) : lb.unavailable ? (
             <div className="pt-8 mt-8 border-t border-neutral-100 space-y-4">
               <p className="text-sm text-neutral-500">{lb.unavailable}</p>

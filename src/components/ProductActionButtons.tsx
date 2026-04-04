@@ -1,29 +1,38 @@
 'use client';
 import { useState } from 'react';
 import { useI18n } from '@/lib/i18n/context';
+import { useCart } from '@/lib/cart/CartContext';
 
 interface ProductActionButtonsProps {
   productId: string;
+  productName: string;
   price: number;
+  originalPrice: number;
+  imageUrl: string;
   naverStoreUrl?: string;
 }
 
-export default function ProductActionButtons({ productId, price, naverStoreUrl }: ProductActionButtonsProps) {
+export default function ProductActionButtons({ productId, productName, price, originalPrice, imageUrl, naverStoreUrl }: ProductActionButtonsProps) {
   const [quantity, setQuantity] = useState(1);
+  const [added, setAdded] = useState(false);
   const { t } = useI18n();
+  const { addItem } = useCart();
 
   const increase = () => setQuantity(prev => prev + 1);
   const decrease = () => setQuantity(prev => (prev > 1 ? prev - 1 : 1));
 
   const handleAddToCart = () => {
-    alert(`[장바구니] 상품이 추가되었습니다!\n\n상품 ID: ${productId}\n수량: ${quantity}개\n\n* 실제 장바구니 DB 연결은 Phase 2에서 진행됩니다.`);
+    addItem({ productId, name: productName, price, originalPrice, imageUrl }, quantity);
+    setAdded(true);
+    setTimeout(() => setAdded(false), 2000);
   };
 
   const handleBuyNow = () => {
     if (naverStoreUrl) {
       window.open(naverStoreUrl, '_blank', 'noopener,noreferrer');
     } else {
-      alert(`[결제] 결제 페이지로 이동합니다.\n\n총 결제금액: ${(price * quantity).toLocaleString()}원\n\n* 실제 결제 모듈 연동은 Phase 2에서 진행됩니다.`);
+      addItem({ productId, name: productName, price, originalPrice, imageUrl }, quantity);
+      window.location.href = '/cart';
     }
   };
 
@@ -49,9 +58,11 @@ export default function ProductActionButtons({ productId, price, naverStoreUrl }
       <div className="flex gap-2">
         <button
           onClick={handleAddToCart}
-          className="flex-1 bg-white border border-[#111111] text-[#111111] py-4.5 font-bold tracking-widest text-[13px] hover:bg-neutral-50 transition-colors"
+          className={`flex-1 border py-4.5 font-bold tracking-widest text-[13px] transition-colors ${
+            added ? 'bg-green-600 border-green-600 text-white' : 'bg-white border-[#111111] text-[#111111] hover:bg-neutral-50'
+          }`}
         >
-          {t('product.addToCart')}
+          {added ? '✓ 담았습니다' : t('product.addToCart')}
         </button>
         <button
           onClick={handleBuyNow}
