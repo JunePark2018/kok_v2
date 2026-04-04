@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
-import { Noto_Sans } from 'next/font/google';
+import { Noto_Sans_KR } from 'next/font/google';
 import './globals.css';
 import StorefrontLayoutWrapper from '@/components/StorefrontLayoutWrapper';
 
-const notoSans = Noto_Sans({ subsets: ['latin', 'latin-ext'], weight: ['300', '400', '500', '600', '700', '800', '900'] });
+const notoSans = Noto_Sans_KR({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700', '800', '900'] });
 
 export const metadata: Metadata = {
   title: 'Kokkok Garden',
