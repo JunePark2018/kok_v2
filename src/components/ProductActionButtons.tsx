@@ -28,12 +28,8 @@ export default function ProductActionButtons({ productId, productName, price, or
   };
 
   const handleBuyNow = () => {
-    if (naverStoreUrl) {
-      window.open(naverStoreUrl, '_blank', 'noopener,noreferrer');
-    } else {
-      addItem({ productId, name: productName, price, originalPrice, imageUrl }, quantity);
-      window.location.href = '/cart';
-    }
+    addItem({ productId, name: productName, price, originalPrice, imageUrl }, quantity);
+    window.location.href = '/cart';
   };
 
   return (
@@ -69,11 +65,20 @@ export default function ProductActionButtons({ productId, productName, price, or
           className="flex-1 bg-[#111111] text-white py-4.5 font-bold tracking-widest text-[13px] hover:bg-black transition-colors shadow-lg shadow-black/10"
         >
           {t('product.buyNow')}
-          {naverStoreUrl && (
-            <span className="ml-1 text-[10px] opacity-70">↗</span>
-          )}
         </button>
       </div>
+
+      {/* Naver Store button */}
+      {naverStoreUrl && (
+        <a
+          href={naverStoreUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 w-full py-3.5 bg-[#03C75A] text-white font-bold text-[13px] tracking-wider hover:bg-[#02b351] transition-colors"
+        >
+          네이버 스토어에서 구매 ↗
+        </a>
+      )}
     </div>
   );
 }
