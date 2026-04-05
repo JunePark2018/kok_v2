@@ -4,8 +4,25 @@ import { Plus, Trash2, Upload, X, ImageIcon, Pencil, GripVertical } from 'lucide
 import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/api/products';
 import type { CarouselSlide } from '@/lib/api/carousel';
+import { SUPPORTED_LANGS, LANG_LABELS } from '@/lib/i18n/types';
 
 const BUCKET = 'product-images';
+
+interface FormData {
+  badge: Record<string, string>;
+  title: Record<string, string>;
+  subtitle: Record<string, string>;
+  bg_color: string;
+  sort_order: string;
+  is_active: boolean;
+  imageUrl: string;
+  imageFile: File | null;
+}
+
+const emptyForm: FormData = {
+  badge: {}, title: {}, subtitle: {},
+  bg_color: '#eef4f7', sort_order: '0', is_active: true, imageUrl: '', imageFile: null,
+};
 
 export default function CarouselAdminPage() {
   const [slides, setSlides] = useState<CarouselSlide[]>([]);
@@ -15,18 +32,9 @@ export default function CarouselAdminPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<'idle' | 'uploading' | 'done' | 'error'>('idle');
   const [previewUrl, setPreviewUrl] = useState('');
+  const [activeLang, setActiveLang] = useState<string>('kr');
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [formData, setFormData] = useState({
-    badge_kr: '', badge_en: '',
-    title_kr: '', title_en: '',
-    subtitle_kr: '', subtitle_en: '',
-    bg_color: '#eef4f7',
-    sort_order: '0',
-    is_active: true,
-    imageUrl: '',
-    imageFile: null as File | null,
-  });
+  const [formData, setFormData] = useState<FormData>({ ...emptyForm });
 
   useEffect(() => { fetchAll(); }, []);
 
@@ -34,14 +42,10 @@ export default function CarouselAdminPage() {
     setIsLoading(true);
     try {
       if (!supabase) throw new Error('클라이언트 없음');
-      const { data, error } = await supabase
-        .from('carousel_slides')
-        .select('*')
-        .order('sort_order', { ascending: true });
+      const { data, error } = await supabase.from('carousel_slides').select('*').order('sort_order', { ascending: true });
       if (error) throw error;
       setSlides(data || []);
     } catch {
-      console.warn('캐러셀 데이터 로딩 실패');
       setSlides([]);
     } finally {
       setIsLoading(false);
@@ -62,13 +66,8 @@ export default function CarouselAdminPage() {
     const ext = file.name.split('.').pop() ?? 'jpg';
     const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
     const filePath = `carousel/${fileName}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from(BUCKET)
-      .upload(filePath, file, { cacheControl: '3600', upsert: false, contentType: file.type });
-
+    const { error: uploadError } = await supabase.storage.from(BUCKET).upload(filePath, file, { cacheControl: '3600', upsert: false, contentType: file.type });
     if (uploadError) { setUploadProgress('error'); throw uploadError; }
-
     const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(filePath);
     setUploadProgress('done');
     return urlData.publicUrl;
@@ -77,25 +76,22 @@ export default function CarouselAdminPage() {
   const resetModal = () => {
     setIsModalOpen(false);
     setEditingId(null);
-    setFormData({ badge_kr: '', badge_en: '', title_kr: '', title_en: '', subtitle_kr: '', subtitle_en: '', bg_color: '#eef4f7', sort_order: '0', is_active: true, imageUrl: '', imageFile: null });
+    setFormData({ ...emptyForm, badge: {}, title: {}, subtitle: {} });
     setPreviewUrl('');
     setUploadProgress('idle');
     setIsSubmitting(false);
+    setActiveLang('kr');
   };
 
   const openEdit = (s: CarouselSlide) => {
     setEditingId(s.id);
     setFormData({
-      badge_kr: s.badge?.kr || '', badge_en: s.badge?.en || '',
-      title_kr: s.title?.kr || '', title_en: s.title?.en || '',
-      subtitle_kr: s.subtitle?.kr || '', subtitle_en: s.subtitle?.en || '',
-      bg_color: s.bg_color || '#eef4f7',
-      sort_order: String(s.sort_order),
-      is_active: s.is_active,
-      imageUrl: s.image_url || '',
-      imageFile: null,
+      badge: { ...s.badge }, title: { ...s.title }, subtitle: { ...s.subtitle },
+      bg_color: s.bg_color || '#eef4f7', sort_order: String(s.sort_order),
+      is_active: s.is_active, imageUrl: s.image_url || '', imageFile: null,
     });
     setPreviewUrl(s.image_url || '');
+    setActiveLang('kr');
     setIsModalOpen(true);
   };
 
@@ -110,6 +106,10 @@ export default function CarouselAdminPage() {
     if (supabase) await supabase.from('carousel_slides').update({ is_active: !current }).eq('id', id);
   };
 
+  const updateField = (field: 'badge' | 'title' | 'subtitle', lang: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: { ...prev[field], [lang]: value } }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -119,19 +119,12 @@ export default function CarouselAdminPage() {
         try { finalImageUrl = await uploadImage(formData.imageFile); }
         catch { finalImageUrl = ''; }
       }
-
       const payload = {
-        badge: { kr: formData.badge_kr, en: formData.badge_en },
-        title: { kr: formData.title_kr, en: formData.title_en },
-        subtitle: { kr: formData.subtitle_kr, en: formData.subtitle_en },
-        image_url: finalImageUrl || null,
-        bg_color: formData.bg_color,
-        sort_order: parseInt(formData.sort_order) || 0,
-        is_active: formData.is_active,
+        badge: formData.badge, title: formData.title, subtitle: formData.subtitle,
+        image_url: finalImageUrl || null, bg_color: formData.bg_color,
+        sort_order: parseInt(formData.sort_order) || 0, is_active: formData.is_active,
       };
-
       if (!supabase) throw new Error('클라이언트 없음');
-
       if (editingId) {
         const { error } = await supabase.from('carousel_slides').update(payload).eq('id', editingId);
         if (error) throw error;
@@ -139,7 +132,6 @@ export default function CarouselAdminPage() {
         const { error } = await supabase.from('carousel_slides').insert([payload]);
         if (error) throw error;
       }
-
       await fetchAll();
       resetModal();
     } catch (err) {
@@ -186,18 +178,10 @@ export default function CarouselAdminPage() {
             <tbody className="divide-y divide-gray-100">
               {slides.map((s) => (
                 <tr key={s.id} className={`hover:bg-gray-50/50 transition-colors ${!s.is_active ? 'opacity-50' : ''}`}>
-                  <td className="p-4 pl-6">
-                    <div className="flex items-center gap-1 text-gray-400">
-                      <GripVertical className="w-4 h-4" />
-                      <span className="text-sm font-mono">{s.sort_order}</span>
-                    </div>
-                  </td>
+                  <td className="p-4 pl-6"><div className="flex items-center gap-1 text-gray-400"><GripVertical className="w-4 h-4" /><span className="text-sm font-mono">{s.sort_order}</span></div></td>
                   <td className="p-4">
                     <div className="w-16 h-12 rounded overflow-hidden bg-gray-100 border border-gray-200">
-                      {s.image_url
-                        ? <img src={s.image_url} className="w-full h-full object-cover" alt="" />
-                        : <div className="w-full h-full flex items-center justify-center"><ImageIcon className="w-4 h-4 text-gray-300" /></div>
-                      }
+                      {s.image_url ? <img src={s.image_url} className="w-full h-full object-cover" alt="" /> : <div className="w-full h-full flex items-center justify-center"><ImageIcon className="w-4 h-4 text-gray-300" /></div>}
                     </div>
                   </td>
                   <td className="p-4">
@@ -205,30 +189,16 @@ export default function CarouselAdminPage() {
                     <p className="text-sm font-bold text-gray-900 line-clamp-1">{(s.title?.kr || '').replace(/\n/g, ' ')}</p>
                     <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{s.subtitle?.kr || ''}</p>
                   </td>
+                  <td className="p-4"><div className="flex items-center gap-2"><div className="w-6 h-6 rounded border border-gray-200" style={{ backgroundColor: s.bg_color }} /><span className="text-xs text-gray-400 font-mono">{s.bg_color}</span></div></td>
                   <td className="p-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded border border-gray-200" style={{ backgroundColor: s.bg_color }} />
-                      <span className="text-xs text-gray-400 font-mono">{s.bg_color}</span>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <button
-                      onClick={() => handleToggle(s.id, s.is_active)}
-                      className={`inline-flex px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase transition-colors ${
-                        s.is_active ? 'bg-green-50 text-green-700 hover:bg-green-100' : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200'
-                      }`}
-                    >
+                    <button onClick={() => handleToggle(s.id, s.is_active)} className={`inline-flex px-2.5 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase transition-colors ${s.is_active ? 'bg-green-50 text-green-700 hover:bg-green-100' : 'bg-neutral-100 text-neutral-500 hover:bg-neutral-200'}`}>
                       {s.is_active ? '활성' : '비활성'}
                     </button>
                   </td>
                   <td className="p-4 pr-6 text-right">
                     <div className="flex gap-1.5 justify-end">
-                      <button onClick={() => openEdit(s)} className="text-gray-400 hover:text-blue-600 transition-colors bg-white p-1.5 rounded-md shadow-sm border border-gray-100">
-                        <Pencil className="w-4 h-4" />
-                      </button>
-                      <button onClick={() => handleDelete(s.id)} className="text-gray-400 hover:text-red-600 transition-colors bg-white p-1.5 rounded-md shadow-sm border border-gray-100">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <button onClick={() => openEdit(s)} className="text-gray-400 hover:text-blue-600 transition-colors bg-white p-1.5 rounded-md shadow-sm border border-gray-100"><Pencil className="w-4 h-4" /></button>
+                      <button onClick={() => handleDelete(s.id)} className="text-gray-400 hover:text-red-600 transition-colors bg-white p-1.5 rounded-md shadow-sm border border-gray-100"><Trash2 className="w-4 h-4" /></button>
                     </div>
                   </td>
                 </tr>
@@ -244,9 +214,7 @@ export default function CarouselAdminPage() {
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[92vh]">
             <div className="p-5 border-b border-gray-100 flex justify-between items-center bg-gray-50">
               <h3 className="font-bold text-lg">{editingId ? '슬라이드 수정' : '새 슬라이드 추가'}</h3>
-              <button onClick={resetModal} className="text-gray-400 hover:text-black transition-colors p-1 rounded hover:bg-gray-100">
-                <X className="w-5 h-5" />
-              </button>
+              <button onClick={resetModal} className="text-gray-400 hover:text-black transition-colors p-1 rounded hover:bg-gray-100"><X className="w-5 h-5" /></button>
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-5">
@@ -254,16 +222,11 @@ export default function CarouselAdminPage() {
               {/* Image upload */}
               <div className="space-y-2">
                 <label className="text-[11px] font-bold tracking-widest text-gray-500 uppercase">슬라이드 이미지</label>
-                <div
-                  className={`relative border-2 border-dashed rounded-xl transition-colors cursor-pointer group ${previewUrl ? 'border-gray-200' : 'border-gray-200 hover:border-gray-400'}`}
-                  onClick={() => fileInputRef.current?.click()}
-                >
+                <div className={`relative border-2 border-dashed rounded-xl transition-colors cursor-pointer group ${previewUrl ? 'border-gray-200' : 'border-gray-200 hover:border-gray-400'}`} onClick={() => fileInputRef.current?.click()}>
                   {previewUrl ? (
                     <div className="relative">
                       <img src={previewUrl} alt="미리보기" className="w-full h-44 object-contain rounded-xl bg-gray-50" />
-                      <button type="button" onClick={(e) => { e.stopPropagation(); setPreviewUrl(''); setFormData(prev => ({ ...prev, imageFile: null, imageUrl: '' })); setUploadProgress('idle'); if (fileInputRef.current) fileInputRef.current.value = ''; }} className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1 hover:bg-black transition-colors">
-                        <X className="w-4 h-4" />
-                      </button>
+                      <button type="button" onClick={(e) => { e.stopPropagation(); setPreviewUrl(''); setFormData(prev => ({ ...prev, imageFile: null, imageUrl: '' })); setUploadProgress('idle'); if (fileInputRef.current) fileInputRef.current.value = ''; }} className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1 hover:bg-black transition-colors"><X className="w-4 h-4" /></button>
                       {uploadProgress === 'uploading' && <div className="absolute inset-0 bg-white/70 rounded-xl flex items-center justify-center"><div className="text-sm text-gray-700 font-semibold animate-pulse">업로드 중...</div></div>}
                       {uploadProgress === 'done' && <div className="absolute bottom-2 left-2 bg-green-600 text-white text-[10px] font-bold px-2 py-1 rounded-md">업로드 완료</div>}
                     </div>
@@ -278,47 +241,39 @@ export default function CarouselAdminPage() {
                 <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" onChange={handleFileSelect} />
                 {!formData.imageFile && (
                   <>
-                    <div className="flex items-center gap-2 mt-2">
-                      <div className="h-px flex-1 bg-gray-100" /><span className="text-[10px] text-gray-400 font-semibold">또는 URL 직접 입력</span><div className="h-px flex-1 bg-gray-100" />
-                    </div>
+                    <div className="flex items-center gap-2 mt-2"><div className="h-px flex-1 bg-gray-100" /><span className="text-[10px] text-gray-400 font-semibold">또는 URL 직접 입력</span><div className="h-px flex-1 bg-gray-100" /></div>
                     <input type="url" value={formData.imageUrl} onChange={e => { setFormData(prev => ({ ...prev, imageUrl: e.target.value })); setPreviewUrl(e.target.value); }} placeholder="https://example.com/image.jpg" className="w-full border border-gray-200 p-2 text-sm rounded bg-gray-50 focus:bg-white focus:border-black transition outline-none" />
                   </>
                 )}
               </div>
 
-              {/* Badge (kr / en) */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold tracking-widest text-gray-500 uppercase">뱃지 (한국어)</label>
-                  <input type="text" value={formData.badge_kr} onChange={e => setFormData(prev => ({ ...prev, badge_kr: e.target.value }))} placeholder="수분천재 크림" className="w-full border border-gray-200 p-2 text-sm rounded bg-gray-50 focus:bg-white focus:border-black transition outline-none" />
+              {/* Language tabs */}
+              <div>
+                <div className="flex gap-1 mb-4">
+                  {SUPPORTED_LANGS.map(l => (
+                    <button key={l} type="button" onClick={() => setActiveLang(l)} className={`px-3 py-1.5 text-xs font-semibold rounded transition-colors ${activeLang === l ? 'bg-black text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
+                      {LANG_LABELS[l]}
+                      {(formData.badge[l] || formData.title[l]) && <span className="ml-1 w-1.5 h-1.5 bg-green-400 rounded-full inline-block" />}
+                    </button>
+                  ))}
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold tracking-widest text-gray-500 uppercase">뱃지 (English)</label>
-                  <input type="text" value={formData.badge_en} onChange={e => setFormData(prev => ({ ...prev, badge_en: e.target.value }))} placeholder="Moisture Cream" className="w-full border border-gray-200 p-2 text-sm rounded bg-gray-50 focus:bg-white focus:border-black transition outline-none" />
-                </div>
-              </div>
 
-              {/* Title (kr / en) */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold tracking-widest text-gray-500 uppercase">제목 (한국어) *</label>
-                  <textarea required rows={3} value={formData.title_kr} onChange={e => setFormData(prev => ({ ...prev, title_kr: e.target.value }))} placeholder={"강력한\n고보습 케어"} className="w-full border border-gray-200 p-2 text-sm rounded bg-gray-50 focus:bg-white focus:border-black transition outline-none resize-none" />
+                {/* Badge */}
+                <div className="space-y-1 mb-4">
+                  <label className="text-[11px] font-bold tracking-widest text-gray-500 uppercase">뱃지 ({LANG_LABELS[activeLang as keyof typeof LANG_LABELS]})</label>
+                  <input type="text" value={formData.badge[activeLang] || ''} onChange={e => updateField('badge', activeLang, e.target.value)} placeholder={activeLang === 'kr' ? '수분천재 크림' : 'Moisture Cream'} className="w-full border border-gray-200 p-2 text-sm rounded bg-gray-50 focus:bg-white focus:border-black transition outline-none" />
                 </div>
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold tracking-widest text-gray-500 uppercase">제목 (English)</label>
-                  <textarea rows={3} value={formData.title_en} onChange={e => setFormData(prev => ({ ...prev, title_en: e.target.value }))} placeholder={"Intense\nMoisture Care"} className="w-full border border-gray-200 p-2 text-sm rounded bg-gray-50 focus:bg-white focus:border-black transition outline-none resize-none" />
-                </div>
-              </div>
 
-              {/* Subtitle (kr / en) */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label className="text-[11px] font-bold tracking-widest text-gray-500 uppercase">부제목 (한국어)</label>
-                  <input type="text" value={formData.subtitle_kr} onChange={e => setFormData(prev => ({ ...prev, subtitle_kr: e.target.value }))} placeholder="사계절 + 속수분 + 윤광 + 모공쫀쫀" className="w-full border border-gray-200 p-2 text-sm rounded bg-gray-50 focus:bg-white focus:border-black transition outline-none" />
+                {/* Title */}
+                <div className="space-y-1 mb-4">
+                  <label className="text-[11px] font-bold tracking-widest text-gray-500 uppercase">제목 ({LANG_LABELS[activeLang as keyof typeof LANG_LABELS]}) {activeLang === 'kr' && '*'}</label>
+                  <textarea required={activeLang === 'kr'} rows={3} value={formData.title[activeLang] || ''} onChange={e => updateField('title', activeLang, e.target.value)} placeholder={activeLang === 'kr' ? '강력한\n고보습 케어' : 'Intense\nMoisture Care'} className="w-full border border-gray-200 p-2 text-sm rounded bg-gray-50 focus:bg-white focus:border-black transition outline-none resize-none" />
                 </div>
+
+                {/* Subtitle */}
                 <div className="space-y-1">
-                  <label className="text-[11px] font-bold tracking-widest text-gray-500 uppercase">부제목 (English)</label>
-                  <input type="text" value={formData.subtitle_en} onChange={e => setFormData(prev => ({ ...prev, subtitle_en: e.target.value }))} placeholder="All-season + Deep hydration + Glow" className="w-full border border-gray-200 p-2 text-sm rounded bg-gray-50 focus:bg-white focus:border-black transition outline-none" />
+                  <label className="text-[11px] font-bold tracking-widest text-gray-500 uppercase">부제목 ({LANG_LABELS[activeLang as keyof typeof LANG_LABELS]})</label>
+                  <input type="text" value={formData.subtitle[activeLang] || ''} onChange={e => updateField('subtitle', activeLang, e.target.value)} placeholder={activeLang === 'kr' ? '사계절 + 속수분 + 윤광 + 모공쫀쫀' : 'All-season + Deep hydration + Glow'} className="w-full border border-gray-200 p-2 text-sm rounded bg-gray-50 focus:bg-white focus:border-black transition outline-none" />
                 </div>
               </div>
 

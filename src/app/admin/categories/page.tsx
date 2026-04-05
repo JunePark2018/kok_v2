@@ -4,9 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Plus, Pencil, Trash2, ChevronRight, X } from 'lucide-react';
 import { supabase } from '@/lib/api/products';
 import type { Category } from '@/lib/api/categories';
-
-const LANGS = ['kr', 'en'] as const;
-const LANG_LABELS: Record<string, string> = { kr: '한국어', en: 'English' };
+import { SUPPORTED_LANGS, LANG_LABELS } from '@/lib/i18n/types';
 
 interface FormData {
   slug: string;
@@ -189,7 +187,7 @@ export default function CategoriesAdminPage() {
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1.5">카테고리명 (다국어)</label>
                 <div className="grid grid-cols-2 gap-3">
-                  {LANGS.map(l => (
+                  {SUPPORTED_LANGS.map(l => (
                     <div key={l}>
                       <label className="block text-[10px] text-gray-400 mb-1">{LANG_LABELS[l]}{l === 'kr' && ' *'}</label>
                       <input

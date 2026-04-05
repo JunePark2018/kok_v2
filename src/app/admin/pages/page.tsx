@@ -9,10 +9,7 @@ import TiptapLink from '@tiptap/extension-link';
 import TiptapImage from '@tiptap/extension-image';
 
 /* ── Constants ─────────────────────────────────────────────────────── */
-const LANGS = ['kr', 'en'] as const;
-const LANG_LABELS: Record<string, string> = {
-  kr: '한국어', en: 'English',
-};
+import { SUPPORTED_LANGS, LANG_LABELS, type Lang } from '@/lib/i18n/types';
 
 type LangMap = Record<string, string>;
 
@@ -175,7 +172,7 @@ export default function PagesAdminPage() {
       // Remove empty lang entries
       const cleanTitles: LangMap = {};
       const cleanContents: LangMap = {};
-      for (const l of LANGS) {
+      for (const l of SUPPORTED_LANGS) {
         if (formData.titles[l]) cleanTitles[l] = formData.titles[l];
         if (formData.contents[l]) cleanContents[l] = formData.contents[l];
       }
@@ -266,7 +263,7 @@ export default function PagesAdminPage() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {pages.map(page => {
-                const filledLangs = LANGS.filter(l => page.title?.[l] || page.content?.[l]);
+                const filledLangs = SUPPORTED_LANGS.filter(l => page.title?.[l] || page.content?.[l]);
                 return (
                   <tr key={page.id} className="hover:bg-gray-50/50 transition-colors">
                     <td className="p-4 pl-6 font-bold text-gray-900 text-sm">{getTitle(page)}</td>
@@ -364,7 +361,7 @@ export default function PagesAdminPage() {
               {/* ── Language Tabs ──────────────────────────────────────── */}
               <div className="border border-gray-200 rounded-lg overflow-hidden">
                 <div className="flex border-b border-gray-200 bg-gray-50">
-                  {LANGS.map(l => {
+                  {SUPPORTED_LANGS.map(l => {
                     const hasContent = !!(formData.titles[l] || formData.contents[l]);
                     return (
                       <button key={l} type="button" onClick={() => setActiveLang(l)}
@@ -388,7 +385,7 @@ export default function PagesAdminPage() {
                   {/* Title for active language */}
                   <div className="space-y-1">
                     <label className="text-[11px] font-bold tracking-widest text-gray-500 uppercase">
-                      페이지 제목 ({LANG_LABELS[activeLang]}) {activeLang === 'kr' && '*'}
+                      페이지 제목 ({LANG_LABELS[activeLang as Lang]}) {activeLang === 'kr' && '*'}
                     </label>
                     <input
                       type="text"
@@ -403,14 +400,14 @@ export default function PagesAdminPage() {
                         }));
                       }}
                       className="w-full border border-gray-200 p-2.5 text-sm rounded bg-gray-50 focus:bg-white focus:border-black transition outline-none"
-                      placeholder={activeLang === 'kr' ? '예: 이벤트 & 공지사항' : `Title in ${LANG_LABELS[activeLang]}`}
+                      placeholder={activeLang === 'kr' ? '예: 이벤트 & 공지사항' : `Title in ${LANG_LABELS[activeLang as Lang]}`}
                     />
                   </div>
 
                   {/* Content for active language */}
                   <div className="space-y-1">
                     <label className="text-[11px] font-bold tracking-widest text-gray-500 uppercase">
-                      페이지 내용 ({LANG_LABELS[activeLang]})
+                      페이지 내용 ({LANG_LABELS[activeLang as Lang]})
                     </label>
                     <RichEditor
                       content={formData.contents[activeLang] || ''}

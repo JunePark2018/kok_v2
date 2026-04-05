@@ -5,9 +5,7 @@ import { Plus, Pencil, Trash2, ChevronRight, X, FileText, MessageSquare, Externa
 import Link from 'next/link';
 import { supabase } from '@/lib/api/products';
 import type { Menu } from '@/lib/api/menus';
-
-const LANGS = ['kr', 'en'] as const;
-const LANG_LABELS: Record<string, string> = { kr: '한국어', en: 'English' };
+import { SUPPORTED_LANGS, LANG_LABELS } from '@/lib/i18n/types';
 
 interface FormData {
   slug: string;
@@ -208,7 +206,7 @@ export default function MenusAdminPage() {
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1.5">메뉴명 (다국어)</label>
                 <div className="grid grid-cols-3 gap-3">
-                  {LANGS.map(l => (
+                  {SUPPORTED_LANGS.map(l => (
                     <div key={l}>
                       <label className="block text-[10px] text-gray-400 mb-1">{LANG_LABELS[l]}{l === 'kr' && ' *'}</label>
                       <input type="text" value={form.title[l] || ''} onChange={e => setForm(f => ({ ...f, title: { ...f.title, [l]: e.target.value } }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/5" />
@@ -222,7 +220,7 @@ export default function MenusAdminPage() {
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1.5">콘텐츠</label>
                   <div className="flex gap-1 mb-2">
-                    {LANGS.map(l => (
+                    {SUPPORTED_LANGS.map(l => (
                       <button key={l} onClick={() => setActiveLang(l)} className={`px-3 py-1 text-xs font-semibold rounded transition-colors ${activeLang === l ? 'bg-black text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
                         {l.toUpperCase()}
                         {form.content[l] && <span className="ml-1 w-1.5 h-1.5 bg-green-400 rounded-full inline-block" />}
