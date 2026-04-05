@@ -3,6 +3,9 @@
 import Link from 'next/link';
 import { Trash2, Minus, Plus, ShoppingBag, ArrowLeft, X, ChevronRight } from 'lucide-react';
 import { CartProvider, useCart } from '@/lib/cart/CartContext';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import { I18nProvider } from '@/lib/i18n/context';
 
 function CartContent() {
   const { items, updateQuantity, removeItem, clearCart, totalPrice, totalCount } = useCart();
@@ -214,32 +217,16 @@ function CartContent() {
 
 export default function CartPage() {
   return (
-    <CartProvider>
-      <div className="min-h-screen bg-white flex flex-col font-sans">
-        {/* Header */}
-        <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-neutral-100">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-[66px] flex items-center justify-between">
-            <Link href="/kr" className="text-[22px] font-black tracking-[0.12em] text-[#111] uppercase">
-              KOKKOK GARDEN
-            </Link>
-            <Link href="/kr/products" className="text-[11px] text-neutral-500 hover:text-black font-semibold tracking-widest transition-colors uppercase">
-              쇼핑 계속하기
-            </Link>
-          </div>
-        </header>
-
-        {/* Content */}
-        <main className="flex-1 bg-white">
-          <CartContent />
-        </main>
-
-        {/* Footer */}
-        <footer className="border-t border-neutral-100 py-8">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <p className="text-[11px] text-neutral-400 tracking-wide">© KOKKOK GARDEN All Rights Reserved.</p>
-          </div>
-        </footer>
-      </div>
-    </CartProvider>
+    <I18nProvider isKorea={true} lang="kr">
+      <CartProvider>
+        <div className="min-h-screen bg-white flex flex-col font-sans">
+          <Header canPurchase={true} />
+          <main className="flex-1 bg-white">
+            <CartContent />
+          </main>
+          <Footer />
+        </div>
+      </CartProvider>
+    </I18nProvider>
   );
 }
