@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Users, Package, Video, LayoutDashboard, LogOut, ExternalLink, Tag, MenuSquare } from 'lucide-react';
+import { Users, Package, Video, LayoutDashboard, LogOut, ExternalLink, Tag, MenuSquare, Image } from 'lucide-react';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -12,6 +12,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: '사용자', href: '/admin/users', icon: Users },
     { name: '카테고리', href: '/admin/categories', icon: Tag },
     { name: '상품 관리', href: '/admin/products', icon: Package },
+    { name: '캐러셀', href: '/admin/carousel', icon: Image },
     { name: '메뉴 관리', href: '/admin/menus', icon: MenuSquare },
     { name: '숏츠', href: '/admin/shorts', icon: Video },
   ];
@@ -21,6 +22,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     '/admin/users': '사용자 관리',
     '/admin/categories': '카테고리 관리',
     '/admin/products': '상품 관리',
+    '/admin/carousel': '캐러셀 관리',
     '/admin/menus': '메뉴 관리',
     '/admin/shorts': '숏츠 관리',
   };

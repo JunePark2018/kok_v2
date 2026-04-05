@@ -3,6 +3,7 @@ import ProductGrid from '@/components/ProductGrid';
 import ShortsFeed from '@/components/ShortsFeed';
 import { createClient } from '@supabase/supabase-js';
 import { getProducts } from '@/lib/api/products';
+import { getActiveSlides } from '@/lib/api/carousel';
 import type { Lang } from '@/lib/i18n/types';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
@@ -38,7 +39,7 @@ export default async function GlHomePage({
   const titles = SECTION_TITLES[lang] ?? SECTION_TITLES['en'];
   const banner = GLOBAL_BANNER[lang] ?? GLOBAL_BANNER['en'];
 
-  const allProducts = await getProducts();
+  const [allProducts, carouselSlides] = await Promise.all([getProducts(), getActiveSlides()]);
   const activeProducts = allProducts.filter(p => p.is_active);
 
   const calculateDiscount = (price: number, original: number) =>
@@ -79,7 +80,7 @@ export default async function GlHomePage({
         🌏 {banner}
       </div>
 
-      <HeroSlider lang={lang as Lang} />
+      <HeroSlider lang={lang as Lang} slides={carouselSlides} />
       <ProductGrid title={titles.weeklyBest} products={bestProducts} canPurchase={false} />
       <ProductGrid title={titles.newArrivals} products={newProducts} canPurchase={false} />
       <ShortsFeed shorts={finalShorts} />

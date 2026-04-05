@@ -252,7 +252,30 @@ CREATE POLICY "Comments are deletable" ON public.comments
   FOR DELETE USING (true);
 
 -- ============================================================
--- 7. Supabase Storage: Product Images Bucket
+-- 7. Carousel Slides
+-- ============================================================
+
+CREATE TABLE public.carousel_slides (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  badge jsonb NOT NULL DEFAULT '{}',
+  title jsonb NOT NULL DEFAULT '{}',
+  subtitle jsonb NOT NULL DEFAULT '{}',
+  image_url text,
+  bg_color text DEFAULT '#eef4f7',
+  sort_order integer DEFAULT 0,
+  is_active boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.carousel_slides ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Carousel slides are viewable by everyone" ON public.carousel_slides
+  FOR SELECT USING (true);
+CREATE POLICY "Carousel slides are manageable" ON public.carousel_slides
+  FOR ALL USING (true);
+
+-- ============================================================
+-- 8. Supabase Storage: Product Images Bucket
 -- Run this in your Supabase SQL editor AFTER running the above.
 -- Or create the bucket via Supabase Dashboard > Storage.
 -- ============================================================
