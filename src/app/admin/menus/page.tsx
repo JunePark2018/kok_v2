@@ -107,7 +107,14 @@ export default function MenusAdminPage() {
     }
   };
 
+  const PROTECTED_SLUGS = ['support'];
+
   const handleDelete = async (id: string, hasChildren: boolean) => {
+    const target = menus.find(m => m.id === id);
+    if (target && PROTECTED_SLUGS.includes(target.slug)) {
+      alert('이 메뉴는 시스템 메뉴이므로 삭제할 수 없습니다.');
+      return;
+    }
     const msg = hasChildren ? '이 메뉴와 모든 서브메뉴가 삭제됩니다. 계속하시겠습니까?' : '이 메뉴를 삭제하시겠습니까?';
     if (!confirm(msg)) return;
     if (!supabase) return;
@@ -317,9 +324,11 @@ function MenuRows({ parent, children, onEdit, onDelete, onAddChild }: {
             <button onClick={() => onEdit(parent)} title="수정" className="text-gray-400 hover:text-amber-600 bg-white p-1.5 rounded-md shadow-sm border border-gray-100 transition-colors">
               <Pencil className="w-4 h-4" />
             </button>
-            <button onClick={() => onDelete(parent.id, children.length > 0)} title="삭제" className="text-gray-400 hover:text-red-600 bg-white p-1.5 rounded-md shadow-sm border border-gray-100 transition-colors">
-              <Trash2 className="w-4 h-4" />
-            </button>
+            {parent.slug !== 'support' && (
+              <button onClick={() => onDelete(parent.id, children.length > 0)} title="삭제" className="text-gray-400 hover:text-red-600 bg-white p-1.5 rounded-md shadow-sm border border-gray-100 transition-colors">
+                <Trash2 className="w-4 h-4" />
+              </button>
+            )}
           </div>
         </td>
       </tr>
