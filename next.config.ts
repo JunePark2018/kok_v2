@@ -3,8 +3,14 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   async redirects() {
     return [
-      { source: '/kr/:lang/:path*', destination: '/:lang/:path*', permanent: true },
-      { source: '/gl/:lang/:path*', destination: '/:lang/:path*', permanent: true },
+      // Legacy /kr/kr/... → /kr/...
+      { source: '/kr/kr/:path*', destination: '/kr/:path*', permanent: true },
+      // Legacy /kr/en/... → /en/...
+      { source: '/kr/en/:path*', destination: '/en/:path*', permanent: true },
+      // Legacy /gl/kr/... → /kr/...
+      { source: '/gl/kr/:path*', destination: '/kr/:path*', permanent: true },
+      // Legacy /gl/en/... → /en/...
+      { source: '/gl/en/:path*', destination: '/en/:path*', permanent: true },
     ];
   },
   images: {
