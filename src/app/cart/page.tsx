@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Trash2, Minus, Plus, ShoppingBag, ArrowLeft, X } from 'lucide-react';
+import { Trash2, Minus, Plus, ShoppingBag, ArrowLeft, X, ChevronRight } from 'lucide-react';
 import { CartProvider, useCart } from '@/lib/cart/CartContext';
 
 function CartContent() {
@@ -9,18 +9,26 @@ function CartContent() {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-[65vh] flex flex-col items-center justify-center text-center px-4">
-        <div className="w-20 h-20 rounded-full bg-neutral-50 flex items-center justify-center mb-6">
-          <ShoppingBag className="w-8 h-8 text-neutral-300" />
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-in fade-in duration-500">
+        <div className="flex items-center text-[11px] font-semibold text-neutral-400 mb-8 tracking-widest">
+          <Link href="/kr" className="hover:text-black transition-colors">HOME</Link>
+          <ChevronRight className="w-3 h-3 mx-2" />
+          <span className="text-[#111]">장바구니</span>
         </div>
-        <h2 className="text-lg font-bold text-neutral-800 mb-1.5">장바구니가 비어있습니다</h2>
-        <p className="text-sm text-neutral-400 mb-8">마음에 드는 상품을 담아보세요</p>
-        <Link
-          href="/kr/products"
-          className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#111] text-white text-[13px] font-bold tracking-wider hover:bg-black transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" /> 쇼핑하러 가기
-        </Link>
+
+        <div className="min-h-[50vh] flex flex-col items-center justify-center text-center">
+          <div className="w-20 h-20 rounded-full bg-neutral-50 flex items-center justify-center mb-6">
+            <ShoppingBag className="w-8 h-8 text-neutral-300" />
+          </div>
+          <h2 className="text-xl font-extrabold text-[#111] mb-2">장바구니가 비어있습니다</h2>
+          <p className="text-sm text-neutral-400 mb-8">마음에 드는 상품을 담아보세요</p>
+          <Link
+            href="/kr/products"
+            className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#111] text-white text-[13px] font-bold tracking-wider hover:bg-black transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" /> 쇼핑하러 가기
+          </Link>
+        </div>
       </div>
     );
   }
@@ -31,16 +39,23 @@ function CartContent() {
   }, 0);
 
   return (
-    <div className="max-w-[1600px] mx-auto px-4 sm:px-8 py-10 sm:py-14">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-in fade-in duration-500">
+      {/* Breadcrumb */}
+      <div className="flex items-center text-[11px] font-semibold text-neutral-400 mb-8 tracking-widest">
+        <Link href="/kr" className="hover:text-black transition-colors">HOME</Link>
+        <ChevronRight className="w-3 h-3 mx-2" />
+        <span className="text-[#111]">장바구니</span>
+      </div>
+
       {/* Title */}
-      <div className="flex items-end justify-between mb-10">
+      <div className="flex items-end justify-between mb-8 pb-6 border-b-2 border-[#111]">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#111]">장바구니</h1>
-          <p className="text-sm text-neutral-400 mt-1">총 {totalCount}개의 상품</p>
+          <h1 className="text-3xl font-extrabold tracking-tight text-[#111]">장바구니</h1>
+          <p className="text-xs text-neutral-400 mt-2">총 {totalCount}개의 상품</p>
         </div>
         <button
           onClick={() => { if (confirm('장바구니를 비우시겠습니까?')) clearCart(); }}
-          className="text-[11px] text-neutral-400 hover:text-red-500 font-medium tracking-wide transition-colors"
+          className="text-[11px] text-neutral-400 hover:text-red-500 font-semibold tracking-wide transition-colors"
         >
           전체 삭제
         </button>
@@ -50,7 +65,7 @@ function CartContent() {
         {/* Items List */}
         <div className="flex-1">
           {/* Table header - desktop */}
-          <div className="hidden sm:grid grid-cols-[1fr_120px_140px_100px] gap-4 pb-4 border-b-2 border-[#111] text-[11px] font-bold tracking-widest text-neutral-400 uppercase">
+          <div className="hidden sm:grid grid-cols-[1fr_120px_140px_60px] gap-4 pb-3 text-[11px] font-bold tracking-widest text-neutral-400 uppercase border-b border-neutral-100">
             <span>상품 정보</span>
             <span className="text-center">수량</span>
             <span className="text-right">금액</span>
@@ -64,13 +79,13 @@ function CartContent() {
                 : 0;
 
               return (
-                <div key={item.productId} className="py-6 sm:grid sm:grid-cols-[1fr_120px_140px_100px] sm:gap-4 sm:items-center">
+                <div key={item.productId} className="py-6 sm:grid sm:grid-cols-[1fr_120px_140px_60px] sm:gap-4 sm:items-center">
                   {/* Product info */}
                   <div className="flex gap-4">
                     <Link href={`/kr/products/${item.productId}`} className="flex-shrink-0">
-                      <div className="w-[80px] h-[100px] sm:w-[90px] sm:h-[112px] rounded-[10px] overflow-hidden bg-[#F5F5F5]">
+                      <div className="w-[80px] h-[100px] sm:w-[90px] sm:h-[112px] rounded overflow-hidden bg-[#F5F5F5]">
                         {item.imageUrl ? (
-                          <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                          <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover mix-blend-multiply" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
                             <ShoppingBag className="w-5 h-5 text-neutral-300" />
@@ -79,10 +94,10 @@ function CartContent() {
                       </div>
                     </Link>
                     <div className="flex flex-col justify-center min-w-0">
-                      <Link href={`/kr/products/${item.productId}`}>
+                      <Link href={`/kr/products/${item.productId}`} className="hover:underline underline-offset-2">
                         <h3 className="text-[13px] font-bold text-[#111] leading-snug line-clamp-2">{item.name}</h3>
                       </Link>
-                      <div className="flex items-center gap-2 mt-1.5">
+                      <div className="flex items-center gap-2 mt-2">
                         {discount > 0 && (
                           <span className="text-[13px] font-extrabold text-[#f15a24]">{discount}%</span>
                         )}
@@ -94,9 +109,9 @@ function CartContent() {
                     </div>
                   </div>
 
-                  {/* Quantity - mobile: inline, desktop: centered */}
+                  {/* Quantity */}
                   <div className="flex sm:justify-center mt-4 sm:mt-0">
-                    <div className="inline-flex items-center border border-neutral-200">
+                    <div className="inline-flex items-center border border-neutral-200 rounded">
                       <button
                         onClick={() => updateQuantity(item.productId, item.quantity - 1)}
                         disabled={item.quantity <= 1}
@@ -124,7 +139,7 @@ function CartContent() {
                   {/* Delete */}
                   <div className="hidden sm:flex justify-end">
                     <button
-                      onClick={() => { if (confirm(`"${item.name}" 을(를) 장바구니에서 삭제하시겠습니까?`)) removeItem(item.productId); }}
+                      onClick={() => { if (confirm(`"${item.name}" 을(를) 삭제하시겠습니까?`)) removeItem(item.productId); }}
                       className="w-8 h-8 flex items-center justify-center text-neutral-300 hover:text-red-500 transition-colors"
                     >
                       <X className="w-4 h-4" />
@@ -137,7 +152,7 @@ function CartContent() {
                       {(item.price * item.quantity).toLocaleString()}원
                     </span>
                     <button
-                      onClick={() => { if (confirm(`"${item.name}" 을(를) 장바구니에서 삭제하시겠습니까?`)) removeItem(item.productId); }}
+                      onClick={() => { if (confirm(`"${item.name}" 을(를) 삭제하시겠습니까?`)) removeItem(item.productId); }}
                       className="p-1 text-neutral-300 hover:text-red-500 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -150,9 +165,9 @@ function CartContent() {
         </div>
 
         {/* Order Summary Sidebar */}
-        <div className="lg:w-[360px] flex-shrink-0">
-          <div className="lg:sticky lg:top-24 bg-[#FAFAFA] rounded-xl p-6 sm:p-8 space-y-5">
-            <h3 className="text-[13px] font-bold tracking-widest text-[#111] uppercase">주문 요약</h3>
+        <div className="lg:w-[340px] flex-shrink-0">
+          <div className="lg:sticky lg:top-24 border border-neutral-100 rounded-xl p-6 sm:p-8 space-y-5">
+            <h3 className="text-sm font-bold tracking-widest text-[#111] uppercase pb-4 border-b border-neutral-100">주문 요약</h3>
 
             <div className="space-y-3 text-[13px]">
               <div className="flex justify-between">
@@ -171,7 +186,7 @@ function CartContent() {
               </div>
             </div>
 
-            <div className="pt-5 border-t border-neutral-200">
+            <div className="pt-5 border-t border-neutral-100">
               <div className="flex justify-between items-end">
                 <span className="text-sm font-bold text-[#111]">총 결제금액</span>
                 <span className="text-2xl font-extrabold text-[#111]">{totalPrice.toLocaleString()}<span className="text-base ml-0.5">원</span></span>
@@ -186,7 +201,7 @@ function CartContent() {
             </button>
             <Link
               href="/kr/products"
-              className="block w-full text-center py-3.5 border border-neutral-200 text-neutral-600 text-[13px] font-semibold hover:bg-white transition-colors"
+              className="block w-full text-center py-3.5 border border-neutral-200 text-neutral-600 text-[13px] font-semibold hover:bg-neutral-50 transition-colors"
             >
               쇼핑 계속하기
             </Link>
@@ -200,14 +215,14 @@ function CartContent() {
 export default function CartPage() {
   return (
     <CartProvider>
-      <div className="min-h-screen bg-white flex flex-col">
+      <div className="min-h-screen bg-white flex flex-col font-sans">
         {/* Header */}
-        <header className="sticky top-0 z-40 bg-white border-b border-neutral-100 shadow-[0_1px_0_rgba(0,0,0,0.04)]">
-          <div className="max-w-[1600px] mx-auto px-4 sm:px-8 h-[66px] flex items-center justify-between">
+        <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-neutral-100">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 h-[66px] flex items-center justify-between">
             <Link href="/kr" className="text-[22px] font-black tracking-[0.12em] text-[#111] uppercase">
               KOKKOK GARDEN
             </Link>
-            <Link href="/kr/products" className="text-[11px] text-neutral-500 hover:text-black font-medium tracking-wide transition-colors">
+            <Link href="/kr/products" className="text-[11px] text-neutral-500 hover:text-black font-semibold tracking-widest transition-colors uppercase">
               쇼핑 계속하기
             </Link>
           </div>
@@ -219,8 +234,8 @@ export default function CartPage() {
         </main>
 
         {/* Footer */}
-        <footer className="bg-white border-t border-neutral-200 py-10 text-[#333]">
-          <div className="max-w-[1600px] mx-auto px-4 sm:px-8 text-center">
+        <footer className="border-t border-neutral-100 py-8">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <p className="text-[11px] text-neutral-400 tracking-wide">© KOKKOK GARDEN All Rights Reserved.</p>
           </div>
         </footer>
