@@ -33,10 +33,9 @@ interface WishItem {
 
 interface MyPageProps {
   lang: string;
-  region: 'kr' | 'gl';
 }
 
-export default function MyPage({ lang, region }: MyPageProps) {
+export default function MyPage({ lang }: MyPageProps) {
   const t = L[lang] ?? L['en'];
   const [tab, setTab] = useState<'profile' | 'orders' | 'wishlist'>('profile');
   const [userEmail, setUserEmail] = useState('');
@@ -91,7 +90,7 @@ export default function MyPage({ lang, region }: MyPageProps) {
     document.cookie = "kokkok_auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     document.cookie = "kokkok_admin_auth=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
     supabase?.auth.signOut();
-    window.location.href = `/${region}/${lang}`;
+    window.location.href = `/${lang}`;
   };
 
   const tabs = [
@@ -188,7 +187,7 @@ export default function MyPage({ lang, region }: MyPageProps) {
                       </div>
                       <div className="flex gap-2 flex-shrink-0">
                         <Link
-                          href={`/${region}/${lang}/products/${item.product_id}`}
+                          href={`/${lang}/products/${item.product_id}`}
                           className="px-3 py-1.5 text-xs font-semibold text-neutral-600 border border-neutral-200 rounded hover:bg-neutral-100 transition-colors"
                         >
                           {t.viewProduct}

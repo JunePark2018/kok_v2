@@ -9,11 +9,10 @@ const PAGE_SIZE = 20;
 interface Props {
   slug: string;
   lang: string;
-  region: 'kr' | 'gl';
   page?: string;
 }
 
-export default async function MenuPage({ slug, lang, region, page }: Props) {
+export default async function MenuPage({ slug, lang, page }: Props) {
   const menu = await getMenuBySlug(slug);
   if (!menu) notFound();
 
@@ -25,7 +24,7 @@ export default async function MenuPage({ slug, lang, region, page }: Props) {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-in fade-in duration-500">
         <div className="flex items-center text-[11px] font-semibold text-neutral-400 mb-8 tracking-widest">
-          <Link href={`/${region}/${lang}`} className="hover:text-black transition-colors">HOME</Link>
+          <Link href={`/${lang}`} className="hover:text-black transition-colors">HOME</Link>
           <ChevronRight className="w-3 h-3 mx-2" />
           <span className="text-[#111]">{title}</span>
         </div>
@@ -54,7 +53,7 @@ export default async function MenuPage({ slug, lang, region, page }: Props) {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-in fade-in duration-500">
       <div className="flex items-center text-[11px] font-semibold text-neutral-400 mb-8 tracking-widest">
-        <Link href={`/${region}/${lang}`} className="hover:text-black transition-colors">HOME</Link>
+        <Link href={`/${lang}`} className="hover:text-black transition-colors">HOME</Link>
         <ChevronRight className="w-3 h-3 mx-2" />
         <span className="text-[#111]">{title}</span>
       </div>
@@ -67,7 +66,7 @@ export default async function MenuPage({ slug, lang, region, page }: Props) {
           )}
         </div>
         {canWrite && (
-          <Link href={`/${region}/${lang}/menus/${slug}/write`} className="px-5 py-2.5 bg-[#111] text-white text-[13px] font-bold tracking-wider hover:bg-black transition-colors">
+          <Link href={`/${lang}/menus/${slug}/write`} className="px-5 py-2.5 bg-[#111] text-white text-[13px] font-bold tracking-wider hover:bg-black transition-colors">
             {l.write}
           </Link>
         )}
@@ -87,7 +86,7 @@ export default async function MenuPage({ slug, lang, region, page }: Props) {
           </div>
           <div className="divide-y divide-neutral-100">
             {posts.map((post, idx) => (
-              <Link key={post.id} href={`/${region}/${lang}/menus/${slug}/${post.id}`} className="block sm:grid sm:grid-cols-[1fr_120px_120px] sm:gap-4 py-4 hover:bg-neutral-50 transition-colors -mx-2 px-2 rounded">
+              <Link key={post.id} href={`/${lang}/menus/${slug}/${post.id}`} className="block sm:grid sm:grid-cols-[1fr_120px_120px] sm:gap-4 py-4 hover:bg-neutral-50 transition-colors -mx-2 px-2 rounded">
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-neutral-300 font-mono w-6 hidden sm:inline-block">{totalCount - ((currentPage - 1) * PAGE_SIZE) - idx}</span>
                   <span className="text-[13px] font-semibold text-[#111] line-clamp-1">{post.title}</span>
@@ -106,7 +105,7 @@ export default async function MenuPage({ slug, lang, region, page }: Props) {
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
-            basePath={`/${region}/${lang}/menus/${slug}`}
+            basePath={`/${lang}/menus/${slug}`}
           />
         </div>
       )}

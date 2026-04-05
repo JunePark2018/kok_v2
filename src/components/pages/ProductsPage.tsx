@@ -13,14 +13,13 @@ const labels: Record<string, {
 
 interface Props {
   lang: string;
-  region: 'kr' | 'gl';
   canPurchase: boolean;
   searchQuery?: string;
   categorySlug?: string;
   subSlug?: string;
 }
 
-export default async function ProductsPage({ lang, region, canPurchase, searchQuery, categorySlug, subSlug }: Props) {
+export default async function ProductsPage({ lang, canPurchase, searchQuery, categorySlug, subSlug }: Props) {
   const lb = labels[lang] ?? labels['en'];
 
   const [allProducts, categoriesTree] = await Promise.all([
@@ -109,11 +108,11 @@ export default async function ProductsPage({ lang, region, canPurchase, searchQu
         {categoriesTree.length > 0 && (
           <div className="mt-6 space-y-2">
             <div className="flex gap-2 overflow-x-auto pb-1">
-              <Link href={`/${region}/${lang}/products`} className={`${pillBase} ${isAll ? pillActive : pillInactive}`}>{lb.all}</Link>
+              <Link href={`/${lang}/products`} className={`${pillBase} ${isAll ? pillActive : pillInactive}`}>{lb.all}</Link>
               {categoriesTree.map(cat => (
                 <Link
                   key={cat.slug}
-                  href={`/${region}/${lang}/products?category=${cat.slug}`}
+                  href={`/${lang}/products?category=${cat.slug}`}
                   className={`${pillBase} ${activeCategory?.id === cat.id && !activeSub ? pillActive : pillInactive}`}
                 >
                   {cat.name[lang] || cat.name['en'] || cat.slug}
@@ -124,7 +123,7 @@ export default async function ProductsPage({ lang, region, canPurchase, searchQu
             {activeParent && activeParent.children.length > 0 && (
               <div className="flex gap-2 overflow-x-auto pb-1">
                 <Link
-                  href={`/${region}/${lang}/products?category=${activeParent.slug}`}
+                  href={`/${lang}/products?category=${activeParent.slug}`}
                   className={`${pillBase} ${!activeSub && activeCategory ? pillActive : pillInactive}`}
                 >
                   {lb.all}
@@ -132,7 +131,7 @@ export default async function ProductsPage({ lang, region, canPurchase, searchQu
                 {activeParent.children.map(sub => (
                   <Link
                     key={sub.slug}
-                    href={`/${region}/${lang}/products?sub=${sub.slug}`}
+                    href={`/${lang}/products?sub=${sub.slug}`}
                     className={`${pillBase} ${activeSub?.id === sub.id ? pillActive : pillInactive}`}
                   >
                     {sub.name[lang] || sub.name['en'] || sub.slug}
@@ -155,7 +154,7 @@ export default async function ProductsPage({ lang, region, canPurchase, searchQu
           <span className="text-sm text-neutral-500">
             {lang === 'kr' ? `"${searchQuery}" 검색 결과` : `Results for "${searchQuery}"`}
           </span>
-          <Link href={`/${region}/${lang}/products`} className="text-xs text-neutral-400 hover:text-black underline underline-offset-2">
+          <Link href={`/${lang}/products`} className="text-xs text-neutral-400 hover:text-black underline underline-offset-2">
             {lang === 'kr' ? '초기화' : 'Clear'}
           </Link>
         </div>

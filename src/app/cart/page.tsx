@@ -16,7 +16,7 @@ function CartContent() {
         <h2 className="text-lg font-bold text-neutral-800 mb-1.5">장바구니가 비어있습니다</h2>
         <p className="text-sm text-neutral-400 mb-8">마음에 드는 상품을 담아보세요</p>
         <Link
-          href="/kr/kr/products"
+          href="/kr/products"
           className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#111] text-white text-[13px] font-bold tracking-wider hover:bg-black transition-colors"
         >
           <ArrowLeft className="w-4 h-4" /> 쇼핑하러 가기
@@ -67,7 +67,7 @@ function CartContent() {
                 <div key={item.productId} className="py-6 sm:grid sm:grid-cols-[1fr_120px_140px_100px] sm:gap-4 sm:items-center">
                   {/* Product info */}
                   <div className="flex gap-4">
-                    <Link href={`/kr/kr/products/${item.productId}`} className="flex-shrink-0">
+                    <Link href={`/kr/products/${item.productId}`} className="flex-shrink-0">
                       <div className="w-[80px] h-[100px] sm:w-[90px] sm:h-[112px] rounded-[10px] overflow-hidden bg-[#F5F5F5]">
                         {item.imageUrl ? (
                           <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
@@ -79,7 +79,7 @@ function CartContent() {
                       </div>
                     </Link>
                     <div className="flex flex-col justify-center min-w-0">
-                      <Link href={`/kr/kr/products/${item.productId}`}>
+                      <Link href={`/kr/products/${item.productId}`}>
                         <h3 className="text-[13px] font-bold text-[#111] leading-snug line-clamp-2">{item.name}</h3>
                       </Link>
                       <div className="flex items-center gap-2 mt-1.5">
@@ -185,7 +185,7 @@ function CartContent() {
               결제하기
             </button>
             <Link
-              href="/kr/kr/products"
+              href="/kr/products"
               className="block w-full text-center py-3.5 border border-neutral-200 text-neutral-600 text-[13px] font-semibold hover:bg-white transition-colors"
             >
               쇼핑 계속하기
@@ -204,10 +204,10 @@ export default function CartPage() {
         {/* Header */}
         <header className="sticky top-0 z-40 bg-white border-b border-neutral-100 shadow-[0_1px_0_rgba(0,0,0,0.04)]">
           <div className="max-w-[1600px] mx-auto px-4 sm:px-8 h-[66px] flex items-center justify-between">
-            <Link href="/kr/kr" className="text-[22px] font-black tracking-[0.12em] text-[#111] uppercase">
+            <Link href="/kr" className="text-[22px] font-black tracking-[0.12em] text-[#111] uppercase">
               KOKKOK GARDEN
             </Link>
-            <Link href="/kr/kr/products" className="text-[11px] text-neutral-500 hover:text-black font-medium tracking-wide transition-colors">
+            <Link href="/kr/products" className="text-[11px] text-neutral-500 hover:text-black font-medium tracking-wide transition-colors">
               쇼핑 계속하기
             </Link>
           </div>

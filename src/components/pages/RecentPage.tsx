@@ -23,7 +23,7 @@ function formatTimeAgo(timestamp: number, lang: string): string {
 }
 
 export default function RecentPage() {
-  const { lang, region } = useI18n();
+  const { lang } = useI18n();
   const lb = labels[lang] ?? labels['en'];
   const [items, setItems] = useState<RecentItem[]>([]);
   const [mounted, setMounted] = useState(false);
@@ -69,7 +69,7 @@ export default function RecentPage() {
           <h2 className="text-lg font-bold text-neutral-800 mb-1.5">{lb.empty}</h2>
           <p className="text-sm text-neutral-400 mb-8">{lb.emptyDesc}</p>
           <Link
-            href={`/${region}/${lang}/products`}
+            href={`/${lang}/products`}
             className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#111] text-white text-[13px] font-bold tracking-wider hover:bg-black transition-colors"
           >
             {lb.shop}
@@ -92,7 +92,7 @@ export default function RecentPage() {
                   <X className="w-3.5 h-3.5" />
                 </button>
 
-                <Link href={`/${region}/${lang}/products/${item.id}`} className="block">
+                <Link href={`/${lang}/products/${item.id}`} className="block">
                   <div className="aspect-[5/6] w-full rounded-[16px] overflow-hidden bg-[#F5F5F5] mb-3">
                     {item.imageUrl ? (
                       <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out" />

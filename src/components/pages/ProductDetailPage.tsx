@@ -15,12 +15,11 @@ const labels: Record<string, {
 
 interface Props {
   lang: string;
-  region: 'kr' | 'gl';
   canPurchase: boolean;
   id: string;
 }
 
-export default async function ProductDetailPage({ lang, region, canPurchase, id }: Props) {
+export default async function ProductDetailPage({ lang, canPurchase, id }: Props) {
   const lb = labels[lang] ?? labels['en'];
 
   const allProducts = await getProducts();
@@ -30,7 +29,7 @@ export default async function ProductDetailPage({ lang, region, canPurchase, id 
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4">
         <p className="text-neutral-500 tracking-widest text-sm">{lb.notFound}</p>
-        <Link href={`/${region}/${lang}/products`} className="text-xs font-bold tracking-widest underline underline-offset-4 hover:text-black transition-colors">
+        <Link href={`/${lang}/products`} className="text-xs font-bold tracking-widest underline underline-offset-4 hover:text-black transition-colors">
           ← {lb.shop}
         </Link>
       </div>
@@ -64,9 +63,9 @@ export default async function ProductDetailPage({ lang, region, canPurchase, id 
       <RecentViewTracker productId={id} name={productData.name} price={productData.price} originalPrice={productData.originalPrice} imageUrl={productData.imageUrl} />
       {/* Breadcrumb */}
       <div className="flex items-center text-[11px] font-semibold text-neutral-400 mb-10 tracking-widest flex-wrap gap-y-1">
-        <Link href={`/${region}/${lang}`} className="hover:text-black transition-colors">{lb.home}</Link>
+        <Link href={`/${lang}`} className="hover:text-black transition-colors">{lb.home}</Link>
         <ChevronRight className="w-3 h-3 mx-2" />
-        <Link href={`/${region}/${lang}/products`} className="hover:text-black transition-colors">{lb.shop}</Link>
+        <Link href={`/${lang}/products`} className="hover:text-black transition-colors">{lb.shop}</Link>
         <ChevronRight className="w-3 h-3 mx-2" />
         <span className="text-[#111111]">{translated.ingredient || translated.name}</span>
       </div>

@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      { source: '/kr/:lang/:path*', destination: '/:lang/:path*', permanent: true },
+      { source: '/gl/:lang/:path*', destination: '/:lang/:path*', permanent: true },
+    ];
+  },
   images: {
     remotePatterns: [
       // Supabase Storage

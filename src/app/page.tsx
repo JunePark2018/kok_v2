@@ -7,8 +7,8 @@ export default async function RootRedirectPage() {
   const country = headersList.get('x-vercel-ip-country') || headersList.get('x-user-country') || 'US';
 
   if (country === 'KR') {
-    redirect('/kr/kr');
+    redirect('/kr');
   } else {
-    redirect('/gl/en');
+    redirect('/en');
   }
 }

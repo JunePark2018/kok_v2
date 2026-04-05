@@ -8,10 +8,9 @@ interface Props {
   slug: string;
   postId: string;
   lang: string;
-  region: 'kr' | 'gl';
 }
 
-export default async function PostDetailPage({ slug, postId, lang, region }: Props) {
+export default async function PostDetailPage({ slug, postId, lang }: Props) {
   const [menu, post] = await Promise.all([getMenuBySlug(slug), getPostById(postId)]);
   if (!menu || !post) notFound();
 
@@ -20,9 +19,9 @@ export default async function PostDetailPage({ slug, postId, lang, region }: Pro
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-in fade-in duration-500">
       <div className="flex items-center text-[11px] font-semibold text-neutral-400 mb-8 tracking-widest flex-wrap gap-y-1">
-        <Link href={`/${region}/${lang}`} className="hover:text-black transition-colors">HOME</Link>
+        <Link href={`/${lang}`} className="hover:text-black transition-colors">HOME</Link>
         <ChevronRight className="w-3 h-3 mx-2" />
-        <Link href={`/${region}/${lang}/menus/${slug}`} className="hover:text-black transition-colors">{menuTitle}</Link>
+        <Link href={`/${lang}/menus/${slug}`} className="hover:text-black transition-colors">{menuTitle}</Link>
         <ChevronRight className="w-3 h-3 mx-2" />
         <span className="text-[#111]">{lang === 'kr' ? '게시글' : 'Post'}</span>
       </div>
@@ -49,7 +48,7 @@ export default async function PostDetailPage({ slug, postId, lang, region }: Pro
       </div>
 
       <div className="mt-12 pt-8 border-t border-neutral-100">
-        <Link href={`/${region}/${lang}/menus/${slug}`} className="inline-flex items-center gap-2 text-sm text-neutral-500 hover:text-black transition-colors">
+        <Link href={`/${lang}/menus/${slug}`} className="inline-flex items-center gap-2 text-sm text-neutral-500 hover:text-black transition-colors">
           ← {lang === 'kr' ? '목록으로' : 'Back to list'}
         </Link>
       </div>

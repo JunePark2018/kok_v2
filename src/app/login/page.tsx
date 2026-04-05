@@ -57,7 +57,7 @@ export default function LoginPage() {
               document.cookie = "kokkok_admin_auth=true; path=/; max-age=86400; Secure; SameSite=Lax";
             }
           }
-          window.location.href = `/kr/${lang}`;
+          window.location.href = `/${lang}`;
           return;
         }
       }
@@ -65,7 +65,7 @@ export default function LoginPage() {
       if (id.trim() === 'admin123' && password.trim() === '456789123') {
         document.cookie = "kokkok_auth=true; path=/; max-age=86400; Secure; SameSite=Lax";
         document.cookie = "kokkok_admin_auth=true; path=/; max-age=86400; Secure; SameSite=Lax";
-        window.location.href = `/kr/${lang}`;
+        window.location.href = `/${lang}`;
       } else {
         setError(t.error);
       }
@@ -73,7 +73,7 @@ export default function LoginPage() {
       if (id.trim() === 'admin123' && password.trim() === '456789123') {
         document.cookie = "kokkok_auth=true; path=/; max-age=86400; Secure; SameSite=Lax";
         document.cookie = "kokkok_admin_auth=true; path=/; max-age=86400; Secure; SameSite=Lax";
-        window.location.href = `/kr/${lang}`;
+        window.location.href = `/${lang}`;
       } else {
         setError(t.error);
       }

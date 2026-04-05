@@ -23,7 +23,7 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ id, name, summary, price, originalPrice, discountRate, imageUrl, canPurchase = true }: ProductCardProps) {
-  const { t, lang, region } = useI18n();
+  const { t, lang } = useI18n();
   const { addItem } = useCart();
   const [wishlisted, setWishlisted] = useState(false);
   const [wishLoading, setWishLoading] = useState(false);
@@ -72,7 +72,7 @@ export default function ProductCard({ id, name, summary, price, originalPrice, d
 
   return (
     <div className="group block">
-      <Link href={`/${region}/${lang}/products/${id}`} className="block">
+      <Link href={`/${lang}/products/${id}`} className="block">
         <div className="relative aspect-[5/6] w-full rounded-[16px] overflow-hidden bg-[#F5F5F5] mb-4">
           <img
             src={imageUrl}

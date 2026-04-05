@@ -14,7 +14,7 @@ interface Props {
 }
 
 export default function PostWritePage({ menuId, menuSlug, menuTitle }: Props) {
-  const { lang, region } = useI18n();
+  const { lang } = useI18n();
   const router = useRouter();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -36,7 +36,7 @@ export default function PostWritePage({ menuId, menuSlug, menuTitle }: Props) {
         is_published: true,
       });
       if (error) throw error;
-      router.push(`/${region}/${lang}/menus/${menuSlug}`);
+      router.push(`/${lang}/menus/${menuSlug}`);
     } catch {
       alert(lang === 'kr' ? '게시글 등록에 실패했습니다.' : 'Failed to submit.');
     } finally {
@@ -47,9 +47,9 @@ export default function PostWritePage({ menuId, menuSlug, menuTitle }: Props) {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12 animate-in fade-in duration-500">
       <div className="flex items-center text-[11px] font-semibold text-neutral-400 mb-8 tracking-widest flex-wrap gap-y-1">
-        <Link href={`/${region}/${lang}`} className="hover:text-black transition-colors">HOME</Link>
+        <Link href={`/${lang}`} className="hover:text-black transition-colors">HOME</Link>
         <ChevronRight className="w-3 h-3 mx-2" />
-        <Link href={`/${region}/${lang}/menus/${menuSlug}`} className="hover:text-black transition-colors">{menuTitle}</Link>
+        <Link href={`/${lang}/menus/${menuSlug}`} className="hover:text-black transition-colors">{menuTitle}</Link>
         <ChevronRight className="w-3 h-3 mx-2" />
         <span className="text-[#111]">{lang === 'kr' ? '글쓰기' : 'Write'}</span>
       </div>
@@ -70,7 +70,7 @@ export default function PostWritePage({ menuId, menuSlug, menuTitle }: Props) {
           <textarea rows={12} value={content} onChange={e => setContent(e.target.value)} placeholder={lang === 'kr' ? '내용을 입력하세요...' : 'Write your post...'} className="w-full border border-neutral-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/5 resize-none" />
         </div>
         <div className="flex gap-3 pt-4">
-          <Link href={`/${region}/${lang}/menus/${menuSlug}`} className="px-6 py-3 border border-neutral-200 text-neutral-600 text-sm font-semibold hover:bg-neutral-50 transition-colors">
+          <Link href={`/${lang}/menus/${menuSlug}`} className="px-6 py-3 border border-neutral-200 text-neutral-600 text-sm font-semibold hover:bg-neutral-50 transition-colors">
             {lang === 'kr' ? '취소' : 'Cancel'}
           </Link>
           <button type="submit" disabled={submitting} className="px-8 py-3 bg-[#111] text-white text-sm font-bold tracking-wider hover:bg-black transition-colors disabled:opacity-50">

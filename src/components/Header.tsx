@@ -12,7 +12,6 @@ import { useCart } from '@/lib/cart/CartContext';
 
 interface HeaderProps {
   canPurchase?: boolean;
-  region?: 'gl' | 'kr';
 }
 
 /* ── i18n utility strings ───────────────────────────────────────────── */
@@ -26,7 +25,7 @@ const NAV_LABELS: Record<string, { product: string; event: string; brand: string
   en: { product: 'Product', event: 'EVENT & NOTICE', brand: 'BRAND STORY', review: 'REVIEWS', global: 'SHOP Worldwide', worldwide: 'SHOP Worldwide', contact: 'Contact' },
 };
 
-export default function Header({ canPurchase = true, region = 'kr' }: HeaderProps) {
+export default function Header({ canPurchase = true }: HeaderProps) {
   const { lang } = useI18n();
   const { totalCount } = useCart();
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
@@ -89,7 +88,7 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
     e.preventDefault();
     if (!searchQuery.trim()) return;
     setSearchOpen(false);
-    window.location.href = `/${region}/${lang}/products?q=${encodeURIComponent(searchQuery.trim())}`;
+    window.location.href = `/${lang}/products?q=${encodeURIComponent(searchQuery.trim())}`;
   };
 
   return (
@@ -117,9 +116,9 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
           ) : (
             <Link href="/login" className="hover:text-black transition-colors">{util.login}</Link>
           )}
-          <Link href={`/${region}/${lang}/orders`} className="hover:text-black transition-colors">{util.order}</Link>
-          <Link href={`/${region}/${lang}/recent`} className="hover:text-black transition-colors">{util.recent}</Link>
-          <Link href={`/${region}/${lang}/support`} className="hover:text-black transition-colors">{util.cs} ›</Link>
+          <Link href={`/${lang}/orders`} className="hover:text-black transition-colors">{util.order}</Link>
+          <Link href={`/${lang}/recent`} className="hover:text-black transition-colors">{util.recent}</Link>
+          <Link href={`/${lang}/support`} className="hover:text-black transition-colors">{util.cs} ›</Link>
         </div>
       </div>
 
@@ -139,7 +138,7 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
 
             {/* Logo */}
             <Link
-              href={`/${region}/${lang}`}
+              href={`/${lang}`}
               className="text-[22px] font-black tracking-[0.12em] text-[#111111] uppercase flex-shrink-0 mr-8"
             >
               KOKKOK<br className="hidden" /> GARDEN
@@ -169,14 +168,14 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
                 const menuLabel = menu.title?.[lang] || menu.title?.kr || menu.title?.en || menu.slug;
                 if (!hasChildren) {
                   return (
-                    <Link key={menu.slug} href={`/${region}/${lang}/menus/${menu.slug}`} className="px-4 h-full flex items-center text-[13.5px] font-semibold text-neutral-800 hover:text-black tracking-wide transition-colors">
+                    <Link key={menu.slug} href={`/${lang}/menus/${menu.slug}`} className="px-4 h-full flex items-center text-[13.5px] font-semibold text-neutral-800 hover:text-black tracking-wide transition-colors">
                       {menuLabel}
                     </Link>
                   );
                 }
                 return (
                   <div key={menu.slug} className="relative h-full flex items-center" onMouseEnter={() => openMenu(`menu-${menu.slug}`)} onMouseLeave={closeMenu}>
-                    <Link href={`/${region}/${lang}/menus/${menu.slug}`} className={`flex items-center gap-1 px-4 h-full text-[13.5px] font-semibold tracking-wide transition-colors ${activeMenu === `menu-${menu.slug}` ? 'text-black' : 'text-neutral-800 hover:text-black'}`}>
+                    <Link href={`/${lang}/menus/${menu.slug}`} className={`flex items-center gap-1 px-4 h-full text-[13.5px] font-semibold tracking-wide transition-colors ${activeMenu === `menu-${menu.slug}` ? 'text-black' : 'text-neutral-800 hover:text-black'}`}>
                       {menuLabel}
                     </Link>
                     {activeMenu === `menu-${menu.slug}` && (
@@ -188,7 +187,7 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
 
               {/* Shop Worldwide — direct link */}
               <Link
-                href={`/${region}/${lang}/worldwide`}
+                href={`/${lang}/worldwide`}
                 className="px-4 h-full flex items-center text-[13.5px] font-semibold text-neutral-800 hover:text-black tracking-wide transition-colors"
               >
                 {nav.global}
@@ -200,7 +199,7 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
               <button onClick={() => setSearchOpen(v => !v)} className="p-2 text-neutral-900 hover:opacity-60 transition-opacity" aria-label="Search">
                 <Search className="w-[21px] h-[21px]" />
               </button>
-              <Link href={isLoggedIn ? `/${region}/${lang}/mypage` : '/login'} className="hidden sm:flex p-2 text-neutral-900 hover:opacity-60 transition-opacity" aria-label="Account">
+              <Link href={isLoggedIn ? `/${lang}/mypage` : '/login'} className="hidden sm:flex p-2 text-neutral-900 hover:opacity-60 transition-opacity" aria-label="Account">
                 <User className="w-[21px] h-[21px]" />
               </Link>
               {canPurchase && (
@@ -230,7 +229,7 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
               {productMega.map(col => (
                 <div key={col.slug}>
                   <Link
-                    href={`/${region}/${lang}/products?category=${col.slug}`}
+                    href={`/${lang}/products?category=${col.slug}`}
                     className="text-[13px] font-bold text-neutral-900 hover:text-[#4a7a3e] tracking-wide transition-colors"
                     onClick={() => setActiveMenu(null)}
                   >
@@ -241,7 +240,7 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
                       {col.items.map(item => (
                         <li key={item.slug}>
                           <Link
-                            href={`/${region}/${lang}/products?sub=${item.slug}`}
+                            href={`/${lang}/products?sub=${item.slug}`}
                             className="text-[12.5px] text-neutral-500 hover:text-black transition-colors"
                             onClick={() => setActiveMenu(null)}
                           >
@@ -270,7 +269,7 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
                 {menu.children.map(child => (
                   <Link
                     key={child.slug}
-                    href={`/${region}/${lang}/menus/${child.slug}`}
+                    href={`/${lang}/menus/${child.slug}`}
                     className="text-[13px] font-bold text-neutral-900 hover:text-[#4a7a3e] tracking-wide transition-colors"
                     onClick={() => setActiveMenu(null)}
                   >
@@ -285,14 +284,14 @@ export default function Header({ canPurchase = true, region = 'kr' }: HeaderProp
       {/* ── Mobile Menu Drawer ───────────────────────────────────────── */}
         {mobileOpen && (
           <div className="lg:hidden bg-white border-t border-neutral-100 px-6 py-4 space-y-4 animate-in slide-in-from-top-2 duration-200">
-            <Link href={`/${region}/${lang}/products`} className="block text-sm font-bold text-neutral-800 py-2 border-b border-neutral-100" onClick={() => setMobileOpen(false)}>{nav.product}</Link>
+            <Link href={`/${lang}/products`} className="block text-sm font-bold text-neutral-800 py-2 border-b border-neutral-100" onClick={() => setMobileOpen(false)}>{nav.product}</Link>
             {navMenus.map(menu => (
-              <Link key={menu.slug} href={`/${region}/${lang}/menus/${menu.slug}`} className="block text-sm font-bold text-neutral-800 py-2 border-b border-neutral-100" onClick={() => setMobileOpen(false)}>{menu.title?.[lang] || menu.title?.kr || menu.title?.en || ''}</Link>
+              <Link key={menu.slug} href={`/${lang}/menus/${menu.slug}`} className="block text-sm font-bold text-neutral-800 py-2 border-b border-neutral-100" onClick={() => setMobileOpen(false)}>{menu.title?.[lang] || menu.title?.kr || menu.title?.en || ''}</Link>
             ))}
-            <Link href={`/${region}/${lang}/worldwide`} className="flex items-center gap-2 text-sm font-bold text-neutral-800 py-2 border-b border-neutral-100" onClick={() => setMobileOpen(false)}>
+            <Link href={`/${lang}/worldwide`} className="flex items-center gap-2 text-sm font-bold text-neutral-800 py-2 border-b border-neutral-100" onClick={() => setMobileOpen(false)}>
               <Globe className="w-4 h-4" /> {nav.worldwide}
             </Link>
-            <Link href={`/${region}/${lang}/support`} className="block text-sm font-bold text-neutral-800 py-2" onClick={() => setMobileOpen(false)}>{nav.contact}</Link>
+            <Link href={`/${lang}/support`} className="block text-sm font-bold text-neutral-800 py-2" onClick={() => setMobileOpen(false)}>{nav.contact}</Link>
             <div className="pt-2 flex gap-4 text-[12px] text-neutral-400">
               <Link href="/login" onClick={() => setMobileOpen(false)}>{util.login}</Link>
               <Link href="/register" onClick={() => setMobileOpen(false)}>{util.join}</Link>

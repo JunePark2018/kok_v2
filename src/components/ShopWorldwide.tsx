@@ -21,7 +21,7 @@ export interface RetailerEntry {
 
 export const RETAILERS: RetailerEntry[] = [
   // ── ASIA ──
-  { id: 'kr', country: '한국', countryEn: 'South Korea', region: 'ASIA', storeName: 'Kokkok Garden Official', storeUrl: 'https://kokv2.vercel.app/kr/kr', bannerColor: '#4a7ab5' },
+  { id: 'kr', country: '한국', countryEn: 'South Korea', region: 'ASIA', storeName: 'Kokkok Garden Official', storeUrl: 'https://kokv2.vercel.app/kr', bannerColor: '#4a7ab5' },
   { id: 'jp', country: '日本', countryEn: 'Japan', region: 'ASIA', storeName: 'Kokkok Garden Japan', storeUrl: '#', bannerColor: '#bc002d' },
   { id: 'cn', country: '中国', countryEn: 'China', region: 'ASIA', storeName: 'Kokkok Garden China', storeUrl: '#', bannerColor: '#de2910' },
   { id: 'tw', country: '台灣', countryEn: 'Taiwan', region: 'ASIA', storeName: 'Kokkok Garden Taiwan', storeUrl: '#', bannerColor: '#003070' },
