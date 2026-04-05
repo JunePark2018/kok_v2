@@ -87,6 +87,7 @@ export async function getPostsByMenu(menuId: string): Promise<Post[]> {
     .select('*')
     .eq('menu_id', menuId)
     .eq('is_published', true)
+    .order('is_admin_post', { ascending: false })
     .order('created_at', { ascending: false });
   if (error || !data) return [];
   return data;
@@ -112,6 +113,7 @@ export async function getPostsByMenuPaginated(
     .select('*')
     .eq('menu_id', menuId)
     .eq('is_published', true)
+    .order('is_admin_post', { ascending: false })
     .order('created_at', { ascending: false })
     .range(from, to);
 

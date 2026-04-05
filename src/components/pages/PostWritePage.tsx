@@ -23,7 +23,9 @@ export default function PostWritePage({ menuId, menuSlug, menuTitle, postId }: P
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [authorName, setAuthorName] = useState('');
+  const [isNotice, setIsNotice] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [authState, setAuthState] = useState<'loading' | 'authenticated' | 'unauthenticated'>('loading');
   const [userId, setUserId] = useState<string | null>(null);
 
@@ -31,6 +33,9 @@ export default function PostWritePage({ menuId, menuSlug, menuTitle, postId }: P
     const init = async () => {
       const supabase = createClient();
       const { data: { user } } = await supabase.auth.getUser();
+
+      const adminCookie = document.cookie.includes('kokkok_admin_auth=true');
+      setIsAdmin(adminCookie);
 
       if (!user) {
         // Fallback: check mock admin cookie
@@ -58,6 +63,7 @@ export default function PostWritePage({ menuId, menuSlug, menuTitle, postId }: P
           setTitle(post.title);
           setContent(post.content || '');
           setAuthorName(post.author_name);
+          setIsNotice(post.is_admin_post);
         }
       }
     };
@@ -70,11 +76,15 @@ export default function PostWritePage({ menuId, menuSlug, menuTitle, postId }: P
     setSubmitting(true);
     try {
       const supabase = createClient();
-      const isAdmin = document.cookie.includes('kokkok_admin_auth=true');
 
       if (isEdit && postId) {
         const { error } = await supabase.from('posts')
-          .update({ title: title.trim(), content: content.trim(), updated_at: new Date().toISOString() })
+          .update({
+            title: title.trim(),
+            content: content.trim(),
+            is_admin_post: isAdmin ? isNotice : undefined,
+            updated_at: new Date().toISOString(),
+          })
           .eq('id', postId);
         if (error) throw error;
       } else {
@@ -84,7 +94,7 @@ export default function PostWritePage({ menuId, menuSlug, menuTitle, postId }: P
           content: content.trim(),
           author_name: authorName.trim(),
           author_id: userId,
-          is_admin_post: isAdmin,
+          is_admin_post: isAdmin && isNotice,
           is_published: true,
         });
         if (error) throw error;
@@ -138,6 +148,12 @@ export default function PostWritePage({ menuId, menuSlug, menuTitle, postId }: P
           <label className="block text-xs font-semibold text-neutral-600 mb-1.5">{lang === 'kr' ? '작성자' : 'Author'}</label>
           <input type="text" value={authorName} readOnly className="w-full border border-neutral-200 rounded-lg px-4 py-3 text-sm bg-neutral-50 text-neutral-500 cursor-not-allowed" />
         </div>
+        {isAdmin && (
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" checked={isNotice} onChange={e => setIsNotice(e.target.checked)} className="w-4 h-4 rounded accent-[#111]" />
+            <span className="text-sm font-semibold text-[#111]">{lang === 'kr' ? '공지로 등록' : 'Pin as Notice'}</span>
+          </label>
+        )}
         <div>
           <label className="block text-xs font-semibold text-neutral-600 mb-1.5">{lang === 'kr' ? '제목 *' : 'Title *'}</label>
           <input type="text" required value={title} onChange={e => setTitle(e.target.value)} placeholder={lang === 'kr' ? '제목을 입력하세요' : 'Post title'} className="w-full border border-neutral-200 rounded-lg px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-black/5" />
