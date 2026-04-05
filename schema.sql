@@ -183,7 +183,76 @@ CREATE TRIGGER on_auth_user_created
   FOR EACH ROW EXECUTE PROCEDURE public.handle_new_user();
 
 -- ============================================================
--- 6. Supabase Storage: Product Images Bucket
+-- 6. Menus & Posts & Comments
+-- ============================================================
+
+CREATE TABLE public.menus (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  parent_id uuid REFERENCES public.menus(id) ON DELETE CASCADE,
+  slug text UNIQUE NOT NULL,
+  title jsonb NOT NULL DEFAULT '{}',
+  page_type text CHECK (page_type IN ('page', 'board')) DEFAULT 'page',
+  content jsonb DEFAULT '{}',
+  board_write_role text CHECK (board_write_role IN ('admin', 'user')) DEFAULT 'admin',
+  show_in_nav boolean DEFAULT false,
+  sort_order integer DEFAULT 0,
+  is_published boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE public.posts (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  menu_id uuid NOT NULL REFERENCES public.menus(id) ON DELETE CASCADE,
+  title text NOT NULL,
+  content text,
+  author_name text NOT NULL,
+  is_admin_post boolean DEFAULT false,
+  is_published boolean DEFAULT true,
+  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
+  updated_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE TABLE public.comments (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  post_id uuid NOT NULL REFERENCES public.posts(id) ON DELETE CASCADE,
+  parent_id uuid REFERENCES public.comments(id) ON DELETE CASCADE,
+  author_name text NOT NULL,
+  content text NOT NULL,
+  is_admin_comment boolean DEFAULT false,
+  created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+CREATE INDEX idx_menus_slug ON public.menus(slug);
+CREATE INDEX idx_menus_parent_id ON public.menus(parent_id);
+CREATE INDEX idx_posts_menu_id ON public.posts(menu_id);
+CREATE INDEX idx_posts_published ON public.posts(is_published);
+CREATE INDEX idx_comments_post_id ON public.comments(post_id);
+CREATE INDEX idx_comments_parent_id ON public.comments(parent_id);
+
+ALTER TABLE public.menus ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.posts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.comments ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Menus are viewable by everyone" ON public.menus
+  FOR SELECT USING (true);
+CREATE POLICY "Menus are manageable" ON public.menus
+  FOR ALL USING (true);
+
+CREATE POLICY "Posts are viewable by everyone" ON public.posts
+  FOR SELECT USING (true);
+CREATE POLICY "Posts are manageable" ON public.posts
+  FOR ALL USING (true);
+
+CREATE POLICY "Comments are viewable by everyone" ON public.comments
+  FOR SELECT USING (true);
+CREATE POLICY "Comments are insertable" ON public.comments
+  FOR INSERT WITH CHECK (true);
+CREATE POLICY "Comments are deletable" ON public.comments
+  FOR DELETE USING (true);
+
+-- ============================================================
+-- 7. Supabase Storage: Product Images Bucket
 -- Run this in your Supabase SQL editor AFTER running the above.
 -- Or create the bucket via Supabase Dashboard > Storage.
 -- ============================================================

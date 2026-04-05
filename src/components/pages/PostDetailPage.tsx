@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import { getMenuBySlug, getPostById } from '@/lib/api/menus';
 import { notFound } from 'next/navigation';
+import CommentSection from '@/components/comments/CommentSection';
 
 interface Props {
   slug: string;
@@ -42,6 +43,10 @@ export default async function PostDetailPage({ slug, postId, lang, region }: Pro
           {post.content || (lang === 'kr' ? '내용이 없습니다.' : 'No content.')}
         </div>
       </article>
+
+      <div className="mt-12 pt-8 border-t border-neutral-200">
+        <CommentSection postId={postId} lang={lang} />
+      </div>
 
       <div className="mt-12 pt-8 border-t border-neutral-100">
         <Link href={`/${region}/${lang}/menus/${slug}`} className="inline-flex items-center gap-2 text-sm text-neutral-500 hover:text-black transition-colors">

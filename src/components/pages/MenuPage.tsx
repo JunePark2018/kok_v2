@@ -1,15 +1,19 @@
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
-import { getMenuBySlug, getPostsByMenu } from '@/lib/api/menus';
+import { getMenuBySlug, getPostsByMenuPaginated } from '@/lib/api/menus';
 import { notFound } from 'next/navigation';
+import Pagination from '@/components/Pagination';
+
+const PAGE_SIZE = 20;
 
 interface Props {
   slug: string;
   lang: string;
   region: 'kr' | 'gl';
+  page?: string;
 }
 
-export default async function MenuPage({ slug, lang, region }: Props) {
+export default async function MenuPage({ slug, lang, region, page }: Props) {
   const menu = await getMenuBySlug(slug);
   if (!menu) notFound();
 
@@ -35,13 +39,15 @@ export default async function MenuPage({ slug, lang, region }: Props) {
     );
   }
 
-  // Board type: render post list
-  const posts = await getPostsByMenu(menu.id);
+  // Board type: render post list with pagination
+  const currentPage = Math.max(1, parseInt(page || '1', 10) || 1);
+  const { posts, totalCount } = await getPostsByMenuPaginated(menu.id, currentPage, PAGE_SIZE);
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
   const canWrite = menu.board_write_role === 'user';
 
-  const lb: Record<string, { empty: string; write: string; author: string; date: string }> = {
-    kr: { empty: '등록된 게시글이 없습니다.', write: '글쓰기', author: '작성자', date: '작성일' },
-    en: { empty: 'No posts yet.', write: 'Write', author: 'Author', date: 'Date' },
+  const lb: Record<string, { empty: string; write: string; author: string; date: string; total: string }> = {
+    kr: { empty: '등록된 게시글이 없습니다.', write: '글쓰기', author: '작성자', date: '작성일', total: '총' },
+    en: { empty: 'No posts yet.', write: 'Write', author: 'Author', date: 'Date', total: 'Total' },
   };
   const l = lb[lang] ?? lb['en'];
 
@@ -54,7 +60,12 @@ export default async function MenuPage({ slug, lang, region }: Props) {
       </div>
 
       <div className="flex items-end justify-between mb-8 pb-6 border-b-2 border-[#111]">
-        <h1 className="text-3xl font-extrabold tracking-tight">{title}</h1>
+        <div>
+          <h1 className="text-3xl font-extrabold tracking-tight">{title}</h1>
+          {totalCount > 0 && (
+            <p className="text-xs text-neutral-400 mt-2">{l.total} {totalCount.toLocaleString()}</p>
+          )}
+        </div>
         {canWrite && (
           <Link href={`/${region}/${lang}/menus/${slug}/write`} className="px-5 py-2.5 bg-[#111] text-white text-[13px] font-bold tracking-wider hover:bg-black transition-colors">
             {l.write}
@@ -78,7 +89,7 @@ export default async function MenuPage({ slug, lang, region }: Props) {
             {posts.map((post, idx) => (
               <Link key={post.id} href={`/${region}/${lang}/menus/${slug}/${post.id}`} className="block sm:grid sm:grid-cols-[1fr_120px_120px] sm:gap-4 py-4 hover:bg-neutral-50 transition-colors -mx-2 px-2 rounded">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-neutral-300 font-mono w-6 hidden sm:inline-block">{posts.length - idx}</span>
+                  <span className="text-xs text-neutral-300 font-mono w-6 hidden sm:inline-block">{totalCount - ((currentPage - 1) * PAGE_SIZE) - idx}</span>
                   <span className="text-[13px] font-semibold text-[#111] line-clamp-1">{post.title}</span>
                   {post.is_admin_post && <span className="px-1.5 py-0.5 text-[9px] font-bold bg-[#111] text-white rounded">공지</span>}
                 </div>
@@ -91,6 +102,12 @@ export default async function MenuPage({ slug, lang, region }: Props) {
               </Link>
             ))}
           </div>
+
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            basePath={`/${region}/${lang}/menus/${slug}`}
+          />
         </div>
       )}
     </div>

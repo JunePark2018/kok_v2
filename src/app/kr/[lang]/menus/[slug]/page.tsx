@@ -1,6 +1,13 @@
 import MenuPage from '@/components/pages/MenuPage';
 
-export default async function KrMenuPage({ params }: { params: Promise<{ lang: string; slug: string }> }) {
+export default async function KrMenuPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ lang: string; slug: string }>;
+  searchParams: Promise<{ page?: string }>;
+}) {
   const { lang, slug } = await params;
-  return <MenuPage slug={slug} lang={lang} region="kr" />;
+  const { page } = await searchParams;
+  return <MenuPage slug={slug} lang={lang} region="kr" page={page} />;
 }

@@ -30,6 +30,16 @@ export interface Post {
   updated_at: string;
 }
 
+export interface Comment {
+  id: string;
+  post_id: string;
+  parent_id: string | null;
+  author_name: string;
+  content: string;
+  is_admin_comment: boolean;
+  created_at: string;
+}
+
 export async function getMenuTree(): Promise<MenuWithChildren[]> {
   if (!supabase) return [];
   const { data, error } = await supabase
@@ -81,6 +91,35 @@ export async function getPostsByMenu(menuId: string): Promise<Post[]> {
   return data;
 }
 
+export async function getPostsByMenuPaginated(
+  menuId: string,
+  page: number = 1,
+  pageSize: number = 20
+): Promise<{ posts: Post[]; totalCount: number }> {
+  if (!supabase) return { posts: [], totalCount: 0 };
+
+  const { count } = await supabase
+    .from('posts')
+    .select('*', { count: 'exact', head: true })
+    .eq('menu_id', menuId)
+    .eq('is_published', true);
+
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+  const { data, error } = await supabase
+    .from('posts')
+    .select('*')
+    .eq('menu_id', menuId)
+    .eq('is_published', true)
+    .order('created_at', { ascending: false })
+    .range(from, to);
+
+  return {
+    posts: error || !data ? [] : data,
+    totalCount: count ?? 0,
+  };
+}
+
 export async function getPostById(postId: string): Promise<Post | null> {
   if (!supabase) return null;
   const { data, error } = await supabase
@@ -90,4 +129,47 @@ export async function getPostById(postId: string): Promise<Post | null> {
     .single();
   if (error || !data) return null;
   return data;
+}
+
+export async function getCommentsByPost(postId: string): Promise<Comment[]> {
+  if (!supabase) return [];
+  const { data, error } = await supabase
+    .from('comments')
+    .select('*')
+    .eq('post_id', postId)
+    .order('created_at', { ascending: true });
+  if (error || !data) return [];
+  return data;
+}
+
+export async function createComment(data: {
+  post_id: string;
+  parent_id?: string | null;
+  author_name: string;
+  content: string;
+  is_admin_comment: boolean;
+}): Promise<Comment | null> {
+  if (!supabase) return null;
+  const { data: row, error } = await supabase
+    .from('comments')
+    .insert({
+      post_id: data.post_id,
+      parent_id: data.parent_id || null,
+      author_name: data.author_name,
+      content: data.content,
+      is_admin_comment: data.is_admin_comment,
+    })
+    .select()
+    .single();
+  if (error || !row) return null;
+  return row;
+}
+
+export async function deleteComment(commentId: string): Promise<boolean> {
+  if (!supabase) return false;
+  const { error } = await supabase
+    .from('comments')
+    .delete()
+    .eq('id', commentId);
+  return !error;
 }
