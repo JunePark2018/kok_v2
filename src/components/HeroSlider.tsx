@@ -7,16 +7,6 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Lang } from '@/lib/i18n/types';
 import type { CarouselSlide } from '@/lib/api/carousel';
 
-const FALLBACK_SLIDES: Record<Lang, Array<{ id: string; badge: string; title: string; subtitle: string; image: string; bgColor: string }>> = {
-  kr: [
-    { id: 'f1', badge: '수분천재 크림', title: '강력한 고보습 케어\nPDRN 속광 수분 크림', subtitle: '사계절 + 속수분 + 수분광 + 모공쫀쫀', image: 'https://plus.unsplash.com/premium_photo-1681996500858-ff9cc3f28203?q=80&w=1587&auto=format&fit=crop', bgColor: '#eef4f7' },
-    { id: 'f2', badge: '뷰티 유튜버 PICK', title: '빛나는 결 보습\n비타민 글로우 세럼', subtitle: '미백 + 매끈결 + 투명광채 + 생기충전', image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1587&auto=format&fit=crop', bgColor: '#f4ebe6' },
-  ],
-  en: [
-    { id: 'f1', badge: 'Hydration Genius Cream', title: 'Intense Moisture Care\nPDRN Glow Hydration Cream', subtitle: 'All-Season • Deep Moisture • Glow Skin • Pore Care', image: 'https://plus.unsplash.com/premium_photo-1681996500858-ff9cc3f28203?q=80&w=1587&auto=format&fit=crop', bgColor: '#eef4f7' },
-    { id: 'f2', badge: 'Beauty Youtuber PICK', title: 'Luminous Skin Moisture\nVitamin Glow Serum', subtitle: 'Brightening • Smooth Texture • Radiance • Vitality Boost', image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1587&auto=format&fit=crop', bgColor: '#f4ebe6' },
-  ],
-};
 
 interface HeroSliderProps {
   lang?: Lang;
@@ -27,17 +17,14 @@ export default function HeroSlider({ lang = 'kr', slides: dbSlides }: HeroSlider
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [Autoplay({ delay: 5000 })]);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  // Map DB slides to display format, or fallback to hardcoded
-  const slides = dbSlides && dbSlides.length > 0
-    ? dbSlides.map(s => ({
-        id: s.id,
-        badge: s.badge?.[lang] || s.badge?.kr || s.badge?.en || '',
-        title: s.title?.[lang] || s.title?.kr || s.title?.en || '',
-        subtitle: s.subtitle?.[lang] || s.subtitle?.kr || s.subtitle?.en || '',
-        image: s.image_url || '',
-        bgColor: s.bg_color || '#eef4f7',
-      }))
-    : FALLBACK_SLIDES[lang] ?? FALLBACK_SLIDES['en'];
+  const slides = (dbSlides || []).map(s => ({
+    id: s.id,
+    badge: s.badge?.[lang] || s.badge?.kr || s.badge?.en || '',
+    title: s.title?.[lang] || s.title?.kr || s.title?.en || '',
+    subtitle: s.subtitle?.[lang] || s.subtitle?.kr || s.subtitle?.en || '',
+    image: s.image_url || '',
+    bgColor: s.bg_color || '#eef4f7',
+  }));
 
   const scrollPrev = useCallback(() => {
     if (emblaApi) emblaApi.scrollPrev();
