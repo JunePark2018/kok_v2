@@ -5,7 +5,7 @@ import { Plus, Pencil, Trash2, ChevronRight, X, FileText, MessageSquare, Externa
 import Link from 'next/link';
 import { supabase } from '@/lib/api/products';
 import type { Menu } from '@/lib/api/menus';
-import { SUPPORTED_LANGS, LANG_LABELS } from '@/lib/i18n/types';
+import { SUPPORTED_LANGS, LANG_LABELS, type Lang } from '@/lib/i18n/types';
 
 interface FormData {
   slug: string;
@@ -30,7 +30,7 @@ export default function MenusAdminPage() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormData>({ ...emptyForm });
-  const [activeLang, setActiveLang] = useState<string>('kr');
+  const [activeLang, setActiveLang] = useState<Lang>('kr');
 
   const fetchAll = useCallback(async () => {
     setIsLoading(true);
@@ -202,40 +202,38 @@ export default function MenusAdminPage() {
                 )}
               </div>
 
-              {/* Multi-lang titles */}
+              {/* Multi-lang: tabs for title + content */}
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1.5">메뉴명 (다국어)</label>
-                <div className="grid grid-cols-3 gap-3">
+                <label className="block text-xs font-semibold text-gray-600 mb-2">다국어 콘텐츠</label>
+                <div className="flex gap-1 mb-3">
                   {SUPPORTED_LANGS.map(l => (
-                    <div key={l}>
-                      <label className="block text-[10px] text-gray-400 mb-1">{LANG_LABELS[l]}{l === 'kr' && ' *'}</label>
-                      <input type="text" value={form.title[l] || ''} onChange={e => setForm(f => ({ ...f, title: { ...f.title, [l]: e.target.value } }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/5" />
-                    </div>
+                    <button key={l} type="button" onClick={() => setActiveLang(l)} className={`px-3 py-1.5 text-xs font-semibold rounded transition-colors ${activeLang === l ? 'bg-black text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
+                      {LANG_LABELS[l]}
+                      {(form.title[l] || form.content[l]) && <span className="ml-1 w-1.5 h-1.5 bg-green-400 rounded-full inline-block" />}
+                    </button>
                   ))}
                 </div>
-              </div>
 
-              {/* Content editor for page type */}
-              {form.page_type === 'page' && (
-                <div>
-                  <label className="block text-xs font-semibold text-gray-600 mb-1.5">콘텐츠</label>
-                  <div className="flex gap-1 mb-2">
-                    {SUPPORTED_LANGS.map(l => (
-                      <button key={l} onClick={() => setActiveLang(l)} className={`px-3 py-1 text-xs font-semibold rounded transition-colors ${activeLang === l ? 'bg-black text-white' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'}`}>
-                        {l.toUpperCase()}
-                        {form.content[l] && <span className="ml-1 w-1.5 h-1.5 bg-green-400 rounded-full inline-block" />}
-                      </button>
-                    ))}
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-[10px] text-gray-400 mb-1">메뉴명 ({LANG_LABELS[activeLang]}) {activeLang === 'kr' && '*'}</label>
+                    <input type="text" value={form.title[activeLang] || ''} onChange={e => setForm(f => ({ ...f, title: { ...f.title, [activeLang]: e.target.value } }))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black/5" />
                   </div>
-                  <textarea
-                    rows={8}
-                    value={form.content[activeLang] || ''}
-                    onChange={e => setForm(f => ({ ...f, content: { ...f.content, [activeLang]: e.target.value } }))}
-                    placeholder="HTML 콘텐츠를 입력하세요..."
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-black/5 resize-none"
-                  />
+
+                  {form.page_type === 'page' && (
+                    <div>
+                      <label className="block text-[10px] text-gray-400 mb-1">콘텐츠 ({LANG_LABELS[activeLang]})</label>
+                      <textarea
+                        rows={8}
+                        value={form.content[activeLang] || ''}
+                        onChange={e => setForm(f => ({ ...f, content: { ...f.content, [activeLang]: e.target.value } }))}
+                        placeholder="HTML 콘텐츠를 입력하세요..."
+                        className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-black/5 resize-none"
+                      />
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
 
               {/* Options */}
               <div className="grid grid-cols-3 gap-4">
