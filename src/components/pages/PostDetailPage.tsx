@@ -3,6 +3,7 @@ import { ChevronRight } from 'lucide-react';
 import { getMenuBySlug, getPostById } from '@/lib/api/menus';
 import { notFound } from 'next/navigation';
 import CommentSection from '@/components/comments/CommentSection';
+import PostActions from '@/components/PostActions';
 
 interface Props {
   slug: string;
@@ -32,9 +33,12 @@ export default async function PostDetailPage({ slug, postId, lang }: Props) {
             {post.is_admin_post && <span className="px-2 py-0.5 text-[10px] font-bold bg-[#111] text-white rounded">공지</span>}
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#111] mb-4">{post.title}</h1>
-          <div className="flex items-center gap-4 text-xs text-neutral-400">
-            <span>{post.author_name}</span>
-            <span>{new Date(post.created_at).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4 text-xs text-neutral-400">
+              <span>{post.author_name}</span>
+              <span>{new Date(post.created_at).toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+            </div>
+            <PostActions postId={postId} authorId={post.author_id} isAdminPost={post.is_admin_post} slug={slug} lang={lang} />
           </div>
         </div>
 

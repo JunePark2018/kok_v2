@@ -24,6 +24,7 @@ export interface Post {
   title: string;
   content: string;
   author_name: string;
+  author_id: string | null;
   is_admin_post: boolean;
   is_published: boolean;
   created_at: string;
@@ -171,5 +172,26 @@ export async function deleteComment(commentId: string): Promise<boolean> {
     .from('comments')
     .delete()
     .eq('id', commentId);
+  return !error;
+}
+
+export async function updatePost(
+  postId: string,
+  data: { title: string; content: string }
+): Promise<boolean> {
+  if (!supabase) return false;
+  const { error } = await supabase
+    .from('posts')
+    .update({ title: data.title, content: data.content, updated_at: new Date().toISOString() })
+    .eq('id', postId);
+  return !error;
+}
+
+export async function deletePost(postId: string): Promise<boolean> {
+  if (!supabase) return false;
+  const { error } = await supabase
+    .from('posts')
+    .delete()
+    .eq('id', postId);
   return !error;
 }

@@ -207,6 +207,7 @@ CREATE TABLE public.posts (
   title text NOT NULL,
   content text,
   author_name text NOT NULL,
+  author_id uuid REFERENCES auth.users(id),
   is_admin_post boolean DEFAULT false,
   is_published boolean DEFAULT true,
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL,
