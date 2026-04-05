@@ -21,11 +21,11 @@ export async function proxy(request: NextRequest) {
   ) {
     // Admin gating
     if (pathname.startsWith('/admin')) {
-      const hasMockCookie = request.cookies.has('kokkok_admin_auth');
+      const hasAdminCookie = request.cookies.has('kokkok_admin_auth');
       const hasSupabaseCookie = Array.from(request.cookies.getAll()).some(
         c => c.name.startsWith('sb-') && c.name.endsWith('-auth-token')
       );
-      if (!hasMockCookie && !hasSupabaseCookie) {
+      if (!hasAdminCookie && !hasSupabaseCookie) {
         return NextResponse.redirect(new URL('/login', request.url));
       }
     }
